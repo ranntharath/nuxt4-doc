@@ -1,0 +1,1722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuxt 4 Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Siemreap&display=swap');
+
+        :root {
+            --bg-color: #020420;
+            --surface-color: #0c0e29;
+            --text-main: #e2e8f0;
+            --text-muted: #cbd5e1;
+            --accent: #00DC82;
+            --border-color: #1e293b;
+            --code-bg: #0f172a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        body {
+            font-family: 'Roboto', 'Siemreap', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Layout */
+        .layout { display: flex; flex: 1; overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #0a0f1d;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .sidebar-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        /* Topnav */
+        .topnav {
+            height: 60px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background-color: var(--bg-color);
+            flex-shrink: 0;
+        }
+        .topnav-left {
+            font-weight: 600;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            color: #fff;
+        }
+        /* Custom Dropdown */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-btn {
+            background-color: var(--surface-color);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.95em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 140px;
+            justify-content: space-between;
+        }
+        .dropdown-btn:hover { border-color: var(--accent); }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-width: 100%;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 100;
+        }
+        .dropdown-menu.show { display: flex; }
+        .dropdown-item {
+            padding: 10px 16px;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+            transition: background-color 0.15s;
+        }
+        .dropdown-item:hover { background-color: #1a56db; }
+        
+        .sidebar-item {
+            padding: 10px 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            border-left: 2px solid transparent;
+        }
+        .sidebar-item:hover { color: var(--text-main); background: rgba(255,255,255,0.02); }
+        .sidebar-item.active {
+            color: var(--accent);
+            border-left: 2px solid var(--accent);
+            background: rgba(0, 220, 130, 0.05);
+        }
+        .sidebar-item span.icon { margin-right: 12px; font-size: 1.1em; width: 20px; text-align: center; }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+        }
+        .content-section { display: none; max-width: 850px; margin: 0 auto; animation: fadeIn 0.3s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Typography & Components */
+        h1 { font-size: 2.2em; margin-bottom: 20px; font-weight: 600; line-height: 1.4; }
+        h2 { font-size: 1.5em; margin: 40px 0 15px 0; color: var(--text-main); font-weight: 600; line-height: 1.4; }
+        .super-title { color: var(--accent); font-size: 0.9em; margin-bottom: 10px; font-weight: 500; }
+        p { margin-bottom: 16px; line-height: 1.7; color: var(--text-muted); }
+        
+        .info-box {
+            background-color: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            color: #38bdf8;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        /* Code Block */
+        .code-window {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+            font-family: monospace;
+            font-size: 0.85em;
+            color: var(--text-muted);
+            background: rgba(0,0,0,0.2);
+        }
+        .code-header-left { display: flex; align-items: center; }
+        .code-header span.icon { color: var(--accent); margin-right: 8px; font-size: 1.2em; }
+        .copy-btn { color: var(--text-muted); font-size: 0.9em; cursor: pointer; border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 4px; }
+        .copy-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        .code-content {
+            padding: 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.9em;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre;
+            line-height: 1.5;
+        }
+        .code-content .comment { color: #64748b; }
+        .code-content .keyword { color: #c678dd; }
+        .code-content .string { color: #98c379; }
+        .code-content .function { color: #61afef; }
+        
+        /* Dashboard Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: rgba(0, 220, 130, 0.5); }
+        .card h4 { color: var(--text-main); margin-bottom: 8px; font-size: 1.05em; display: flex; align-items: center; gap: 8px; line-height: 1.4; }
+        .card p { font-size: 0.9em; margin: 0; color: var(--text-muted); line-height: 1.6; }
+        
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin-top: 24px; background: rgba(255,255,255,0.02); border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { color: var(--text-main); font-weight: 500; background: rgba(0,0,0,0.2); }
+        td { color: var(--text-muted); font-size: 0.95em; }
+        tr:last-child td { border-bottom: none; }
+        
+        code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; color: var(--text-main); }
+
+        /* Responsive Design */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 0;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 60px; /* Below topnav */
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: -280px;
+                height: calc(100vh - 60px);
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .sidebar-overlay.show {
+                display: block;
+            }
+            .main-content {
+                padding: 24px 16px;
+            }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.4em; }
+            .hero-title { font-size: 2.2em; }
+            
+            /* Force grids to be 1 column on mobile */
+            div[style*="grid-template-columns: repeat(auto-fit"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Fix code blocks on mobile */
+            .code-content {
+                font-size: 0.85em;
+                padding: 12px;
+                overflow-x: auto;
+            }
+            .code-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <div class="topnav">
+        <div class="topnav-left">
+            <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+            <svg style="width: 24px; height: 24px; margin-right: 10px; fill: var(--accent);" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
+            Nuxt 4
+        </div>
+        <div class="dropdown-container">
+            <div class="dropdown-btn" onclick="toggleDropdown()">
+                <span id="current-lang-text"><span class="fi fi-gb"></span> English</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+            <div class="dropdown-menu" id="lang-menu">
+                <div class="dropdown-item" onclick="setLang('en', '<span class=\'fi fi-gb\'></span> English')"><span class="fi fi-gb"></span> English</div>
+                <div class="dropdown-item" onclick="setLang('kh', '<span class=\'fi fi-kh\'></span> ភាសាខ្មែរ')"><span class="fi fi-kh"></span> ភាសាខ្មែរ</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="layout">
+        
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+
+            <div class="sidebar-scroll">
+                <div style="padding: 20px 20px 10px 20px; font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <div class="sidebar-item active" onclick="showSection('intro', this)"><span class="icon">ℹ️</span> <span data-en="Introduction" data-kh="សេចក្តីផ្តើម">Introduction</span></div>
+                <div class="sidebar-item" onclick="showSection('what', this)"><span class="icon">❓</span> <span data-en="What is Nuxt?" data-kh="តើ Nuxt គឺជាអ្វី?">What is Nuxt?</span></div>
+                <div class="sidebar-item" onclick="showSection('vue-vs-nuxt', this)"><span class="icon">⚖️</span> <span data-en="Vue vs Nuxt" data-kh="Vue ធៀបនឹង Nuxt">Vue vs Nuxt</span></div>
+                <div class="sidebar-item" onclick="showSection('why', this)"><span class="icon">💡</span> <span data-en="Why Use Nuxt?" data-kh="ហេតុអ្វីត្រូវប្រើ Nuxt?">Why Use Nuxt?</span></div>
+                <div class="sidebar-item" onclick="showSection('installation', this)"><span class="icon">🚀</span> <span data-en="Installation" data-kh="ការដំឡើង">Installation</span></div>
+                
+                <div style="padding: 20px 20px 10px 20px; font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;" data-en="Structure" data-kh="រចនាសម្ព័ន្ធ">Structure</div>
+                <div class="sidebar-item" onclick="showSection('structure', this)"><span class="icon">📁</span> <span data-en="Project Structure" data-kh="រចនាសម្ព័ន្ធគម្រោង">Project Structure</span></div>
+                <div class="sidebar-item" onclick="showSection('app-dir', this)"><span class="icon">📦</span> <span data-en="Inside app/" data-kh="ខាងក្នុងថត app/">Inside app/</span></div>
+                <div class="sidebar-item" onclick="showSection('root-dir', this)"><span class="icon">⚙️</span> <span data-en="Root Directories" data-kh="ថតឫសគល់ (Root Directories)">Root Directories</span></div>
+                
+                <div style="padding: 20px 20px 10px 20px; font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <div class="sidebar-item" onclick="showSection('routing', this)"><span class="icon">🔀</span> <span data-en="Routing" data-kh="Routing">Routing</span></div>
+                <div class="sidebar-item" onclick="showSection('dynamic', this)"><span class="icon">🔄</span> <span data-en="Dynamic Routes" data-kh="Dynamic Routes">Dynamic Routes</span></div>
+                <div class="sidebar-item" onclick="showSection('nested', this)"><span class="icon">📂</span> <span data-en="Nested Routes" data-kh="Nested Routes">Nested Routes</span></div>
+                <div class="sidebar-item" onclick="showSection('auto-imports', this)"><span class="icon">✨</span> <span data-en="Auto Imports" data-kh="Auto Imports">Auto Imports</span></div>
+                <div class="sidebar-item" onclick="showSection('big-picture', this)"><span class="icon">🖼️</span> <span data-en="The Big Picture" data-kh="The Big Picture">The Big Picture</span></div>
+                
+                <div style="padding: 20px 20px 10px 20px; font-size: 0.75em; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;" data-en="Rendering" data-kh="ការបង្ហាញ (Rendering)">Rendering</div>
+                <div class="sidebar-item" onclick="showSection('csr', this)"><span class="icon">📱</span> <span data-en="Client-Side (CSR)" data-kh="Client-Side (CSR)">Client-Side (CSR)</span></div>
+                <div class="sidebar-item" onclick="showSection('ssr', this)"><span class="icon">🌍</span> <span data-en="Server-Side (SSR)" data-kh="Server-Side (SSR)">Server-Side (SSR)</span></div>
+                <div class="sidebar-item" onclick="showSection('csr-vs-ssr-compare', this)"><span class="icon">⚖️</span> <span data-en="CSR vs SSR" data-kh="CSR ធៀបនឹង SSR">CSR vs SSR</span></div>
+                <div class="sidebar-item" onclick="showSection('csr-vs-ssr', this)"><span class="icon">💧</span> <span data-en="Universal (Hydration)" data-kh="Universal (Hydration)">Universal (Hydration)</span></div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="main-content">
+            
+            <!-- Intro Section -->
+            <div class="content-section active" id="intro">
+                <div class="super-title" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <h1 data-en="Introduction" data-kh="សេចក្តីផ្តើម">Introduction</h1>
+                <p data-en="Welcome to the Nuxt 4 documentation. Nuxt is the full-stack framework for Vue, designed to make building Vue applications easier, faster, and more powerful." data-kh="សូមស្វាគមន៍មកកាន់ឯកសារ Nuxt 4។ Nuxt គឺជា full-stack framework សម្រាប់ Vue ដែលត្រូវបានរចនាឡើងដើម្បីធ្វើឲ្យការបង្កើតកម្មវិធី Vue កាន់តែងាយស្រួល លឿន និងមានអនុភាព។">Welcome to the Nuxt 4 documentation. Nuxt is the full-stack framework for Vue, designed to make building Vue applications easier, faster, and more powerful.</p>
+                
+                <p data-en="By default, Vue.js is a client-side framework used to build UI components. Nuxt wraps Vue.js to provide a robust, convention-over-configuration architecture that lets you build complete, SEO-friendly web applications." data-kh="តាមលំនាំដើម Vue.js គឺជា client-side framework ដែលប្រើដើម្បីបង្កើត UI តែប៉ុណ្ណោះ។ Nuxt វេចខ្ចប់ Vue.js ដើម្បីផ្តល់នូវស្ថាបត្យកម្មដ៏រឹងមាំ ដែលអនុញ្ញាតឲ្យអ្នកបង្កើតកម្មវិធីបណ្តាញពេញលេញ និងគាំទ្រ SEO យ៉ាងល្អ។">By default, Vue.js is a client-side framework used to build UI components. Nuxt wraps Vue.js to provide a robust, convention-over-configuration architecture that lets you build complete, SEO-friendly web applications.</p>
+
+                <div class="info-box" data-en="Nuxt provides routing, data fetching, SEO, server-side rendering (SSR), and more right out of the box, all utilizing a simple file-based structure." data-kh="Nuxt ផ្តល់នូវ Routing, Data Fetching, SEO, Server-Side Rendering (SSR), និងមុខងារជាច្រើនទៀតស្រាប់ៗ ដោយប្រើរចនាសម្ព័ន្ធឯកសារសាមញ្ញ។">
+                    Nuxt provides routing, data fetching, SEO, server-side rendering (SSR), and more right out of the box, all utilizing a simple file-based structure.
+                </div>
+            </div>
+
+            <!-- What is Nuxt Section -->
+            <div class="content-section" id="what">
+                <div class="super-title" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <h1 data-en="What is Nuxt?" data-kh="តើ Nuxt គឺជាអ្វី?">What is Nuxt?</h1>
+                <p data-en="Nuxt is a framework built on Vue.js. Instead of manually configuring complex build tools, routers, and state management, Nuxt provides these features for you automatically." data-kh="Nuxt គឺជា framework ដែលបង្កើតឡើងនៅលើ Vue.js។ ជំនួសឲ្យការកំណត់រចនាសម្ព័ន្ធស្មុគស្មាញដោយខ្លួនឯង Nuxt ផ្តល់នូវមុខងារទាំងអស់នេះដោយស្វ័យប្រវត្តិ។">Nuxt is a framework built on Vue.js. Instead of manually configuring complex build tools, routers, and state management, Nuxt provides these features for you automatically.</p>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4 data-en="📄 File-based routing" data-kh="📄 File-based routing">📄 File-based routing</h4>
+                        <p data-en="Routes are created automatically from your <code>app/pages/</code> directory without manual configuration." data-kh="Routes ត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិពីថតឯកសារ <code>app/pages/</code> របស់អ្នកដោយមិនចាំបាច់កំណត់រចនាសម្ព័ន្ធ។">Routes are created automatically from your <code>app/pages/</code> directory without manual configuration.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="🔄 Data fetching" data-kh="🔄 Data fetching">🔄 Data fetching</h4>
+                        <p data-en="Built-in <code>useFetch</code> handles server and client data efficiently, preventing double-fetching." data-kh="មុខងារ <code>useFetch</code> គ្រប់គ្រងទិន្នន័យ Server និង Client យ៉ាងមានប្រសិទ្ធភាព។">Built-in <code>useFetch</code> handles server and client data efficiently, preventing double-fetching.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="🖥️ Server-Side Rendering" data-kh="🖥️ Server-Side Rendering (SSR)">🖥️ Server-Side Rendering</h4>
+                        <p data-en="Fast initial loads and perfect SEO right away, rendering Vue on the server." data-kh="ផ្ទុកទិន្នន័យបានលឿន និងផ្តល់នូវ SEO យ៉ាងល្អឥតខ្ចោះ។">Fast initial loads and perfect SEO right away, rendering Vue on the server.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="🌐 API routes" data-kh="🌐 ផ្លូវ API (API Routes)">🌐 API routes</h4>
+                        <p data-en="Build your backend API directly inside the <code>server/</code> folder using the Nitro engine." data-kh="បង្កើត backend API របស់អ្នកដោយផ្ទាល់នៅក្នុងថត <code>server/</code> ។">Build your backend API directly inside the <code>server/</code> folder using the Nitro engine.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="🔍 SEO support" data-kh="🔍 ការគាំទ្រ SEO">🔍 SEO support</h4>
+                        <p data-en="Easy management of head tags and meta descriptions out-of-the-box." data-kh="ងាយស្រួលក្នុងការគ្រប់គ្រង head tags និង meta descriptions។">Easy management of head tags and meta descriptions out-of-the-box.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="📦 Auto imports" data-kh="📦 Auto imports">📦 Auto imports</h4>
+                        <p data-en="Vue APIs, composables, and components are available globally without writing imports." data-kh="Vue APIs និង components មានស្រាប់ដោយមិនបាច់សរសេរ import។">Vue APIs, composables, and components are available globally without writing imports.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="🧩 Layouts & middleware" data-kh="🧩 Layouts និង Middleware">🧩 Layouts & middleware</h4>
+                        <p data-en="Wrap pages in shared UI and intercept navigation for things like authentication easily." data-kh="គ្រប់គ្រងទំព័រជាមួយ UI រួម និងគ្រប់គ្រងការចូលប្រើប្រាស់។">Wrap pages in shared UI and intercept navigation for things like authentication easily.</p>
+                    </div>
+                    <div class="card">
+                        <h4 data-en="⚡ Performance" data-kh="⚡ ប្រសិទ្ធភាពប្រតិបត្តិការ">⚡ Performance</h4>
+                        <p data-en="Powered by Vite and Nitro for lightning-fast build times and runtime execution." data-kh="ដំណើរការដោយ Vite និង Nitro សម្រាប់ល្បឿនដ៏លឿនបំផុត។">Powered by Vite and Nitro for lightning-fast build times and runtime execution.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vue vs Nuxt -->
+            <div class="content-section" id="vue-vs-nuxt">
+                <div class="super-title" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <h1 data-en="Vue vs Nuxt" data-kh="Vue ធៀបនឹង Nuxt">Vue vs Nuxt</h1>
+                <p data-en="While Vue is the core rendering library, Nuxt provides the surrounding architecture necessary to build a production-ready application." data-kh="ខណៈពេលដែល Vue គឺជាបណ្ណាល័យសម្រាប់ rendering គោល, Nuxt ផ្តល់នូវស្ថាបត្យកម្មដែលចាំបាច់ដើម្បីបង្កើតកម្មវិធីដែលរួចរាល់សម្រាប់ការប្រើប្រាស់។">While Vue is the core rendering library, Nuxt provides the surrounding architecture necessary to build a production-ready application.</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-en="Feature" data-kh="លក្ខណៈពិសេស">Feature</th>
+                            <th>Vue.js</th>
+                            <th>Nuxt 4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-en="Scope" data-kh="វិសាលភាព"><strong>Scope</strong></td>
+                            <td data-en="UI framework" data-kh="UI framework">UI framework</td>
+                            <td data-en="Full-stack framework" data-kh="Full-stack framework">Full-stack framework</td>
+                        </tr>
+                        <tr>
+                            <td data-en="Routing" data-kh="Routing"><strong>Routing</strong></td>
+                            <td data-en="Manual setup" data-kh="Manual setup">Manual setup</td>
+                            <td data-en="Automatic file-based" data-kh="Automatic file-based">Automatic file-based</td>
+                        </tr>
+                        <tr>
+                            <td data-en="Rendering" data-kh="Rendering"><strong>Rendering</strong></td>
+                            <td data-en="Client-side" data-kh="Client-side">Client-side</td>
+                            <td data-en="SSR / SSG / Hybrid built-in" data-kh="SSR / SSG / Hybrid built-in">SSR / SSG / Hybrid built-in</td>
+                        </tr>
+                        <tr>
+                            <td data-en="Configuration" data-kh="Configuration"><strong>Configuration</strong></td>
+                            <td data-en="Requires manual wiring" data-kh="Requires manual wiring">Requires manual wiring</td>
+                            <td data-en="Zero-config conventions" data-kh="Zero-config conventions">Zero-config conventions</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box" style="background-color: rgba(0, 220, 130, 0.1); border-color: rgba(0, 220, 130, 0.2); color: #00DC82;">
+                    <span data-en="<strong>Simple Idea:</strong> Use Vue to build your UI components. Use Nuxt to build your complete web application." data-kh="<strong>គំនិតសាមញ្ញ៖</strong> ប្រើ Vue ដើម្បីបង្កើត UI components របស់អ្នក។ ប្រើ Nuxt ដើម្បីបង្កើតកម្មវិធីបណ្តាញពេញលេញរបស់អ្នក។">
+                    <strong>Simple Idea:</strong> Use Vue to build your UI components. Use Nuxt to build your complete web application.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Why Use Nuxt -->
+            <div class="content-section" id="why">
+                <div class="super-title" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <h1 data-en="Why Use Nuxt?" data-kh="ហេតុអ្វីត្រូវប្រើ Nuxt?">Why Use Nuxt?</h1>
+                <p data-en="Nuxt gives you conventions and tools so you write less configuration code and focus more on features." data-kh="Nuxt ផ្តល់នូវការកំណត់ជាមុននិងឧបករណ៍ជាច្រើនដើម្បីឲ្យអ្នកចំណាយពេលសរសេរកូដ config តិច និងផ្តោតលើការបង្កើតលក្ខណៈពិសេសថ្មីៗ។">Nuxt gives you conventions and tools so you write less configuration code and focus more on features.</p>
+                
+                <div class="grid">
+                    <div class="card" style="border-color: #334155;">
+                        <h4 style="color: #94a3b8;" data-en="Without Nuxt (Vue Setup)" data-kh="បើគ្មាន Nuxt (មានតែ Vue)">Without Nuxt (Vue Setup)</h4>
+                        <div class="code-content" style="padding: 0;">
+Vue
+├── Vue Router
+├── Pinia
+├── Axios / Fetch
+├── SSR config
+├── SEO config
+└── Other manual wiring...
+                        </div>
+                    </div>
+                    <div class="card" style="border-color: rgba(0, 220, 130, 0.4); background: rgba(0, 220, 130, 0.02);">
+                        <h4 style="color: var(--accent);" data-en="With Nuxt" data-kh="នៅពេលប្រើ Nuxt">With Nuxt</h4>
+                        <div class="code-content" style="padding: 0; color: #fff;">
+Nuxt
+├── Routing
+├── Data Fetching
+├── SSR / SSG
+├── SEO
+├── Server API
+├── Middleware
+└── Auto Imports
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-top: 24px; background-color: rgba(56, 189, 248, 0.1); border-color: rgba(56, 189, 248, 0.2); color: #38bdf8;">
+                    <div style="width: 100%;">
+                        <span data-en="<strong>Bottom Line:</strong> Nuxt eliminates hours of manual configuration. By providing a standard folder structure and built-in features, your team can start building the actual application from day one without worrying about setting up tools." data-kh="<strong>សរុបសេចក្តី៖</strong> Nuxt លុបបំបាត់ការចំណាយពេលរាប់ម៉ោងលើការកំណត់ configuration ដោយដៃ។ តាមរយៈការផ្តល់នូវរចនាសម្ព័ន្ធស្តង់ដារ និងមុខងារមានស្រាប់ ក្រុមការងាររបស់អ្នកអាចចាប់ផ្តើមបង្កើតកម្មវិធីភ្លាមៗដោយមិនបាច់ខ្វល់ខ្វាយពីការរៀបចំឧបករណ៍ស្មុគស្មាញឡើយ។">
+                        <strong>Bottom Line:</strong> Nuxt eliminates hours of manual configuration. By providing a standard folder structure and built-in features, your team can start building the actual application from day one without worrying about setting up tools.
+                        </span>
+                    </div>
+                </div>
+
+                <h2 data-en="Resulting Project Structure" data-kh="រចនាសម្ព័ន្ធគម្រោងដែលទទួលបាន">Resulting Project Structure</h2>
+                <p data-en="Because of these built-in conventions, your actual project structure becomes incredibly clean and organized:" data-kh="ដោយសារតែការកំណត់ជាមុនទាំងនេះ រចនាសម្ព័ន្ធគម្រោងជាក់ស្តែងរបស់អ្នកក្លាយជាស្អាត និងមានរបៀបរៀបរយយ៉ាងខ្លាំង៖">Because of these built-in conventions, your actual project structure becomes incredibly clean and organized:</p>
+
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📁</span> Nuxt 4 Default Structure</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+my-nuxt-app/
+├── app/                  <span class="comment" data-en="// Your Vue UI (pages, components, layouts)" data-kh="// ផ្នែក UI របស់ Vue (pages, components, layouts)">// Your Vue UI (pages, components, layouts)</span>
+├── server/               <span class="comment" data-en="// Your backend API routes" data-kh="// ផ្នែក Backend API routes">// Your backend API routes</span>
+├── shared/               <span class="comment" data-en="// Code shared between UI and backend" data-kh="// កូដប្រើរួមគ្នារវាង UI និង backend">// Code shared between UI and backend</span>
+├── public/               <span class="comment" data-en="// Static files like images" data-kh="// ឯកសារថេរដូចជារូបភាព">// Static files like images</span>
+└── nuxt.config.ts        <span class="comment" data-en="// The only config file you need!" data-kh="// ឯកសារ config តែមួយគត់ដែលអ្នកត្រូវការ!">// The only config file you need!</span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="content-section" id="installation">
+                <div class="super-title" data-en="Get Started" data-kh="ចាប់ផ្តើម">Get Started</div>
+                <h1 data-en="Installation" data-kh="ការដំឡើង (Installation)">Installation</h1>
+                <p data-en="Creating a new Nuxt 4 project is incredibly easy. You just need Node.js installed on your machine." data-kh="ការបង្កើតគម្រោង Nuxt 4 ថ្មីគឺងាយស្រួលមែនទែន។ អ្នកគ្រាន់តែត្រូវការដំឡើង Node.js នៅលើម៉ាស៊ីនរបស់អ្នកប៉ុណ្ណោះ។">Creating a new Nuxt 4 project is incredibly easy. You just need Node.js installed on your machine.</p>
+                
+                <h2 data-en="1. Initialize a new project" data-kh="1. បង្កើតគម្រោងថ្មី">1. Initialize a new project</h2>
+                <p data-en="Run the following command in your terminal to create a new Nuxt project:" data-kh="ដំណើរការពាក្យបញ្ជាខាងក្រោមនៅក្នុង terminal របស់អ្នក ដើម្បីបង្កើតគម្រោង Nuxt ថ្មី៖">Run the following command in your terminal to create a new Nuxt project:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">💻</span> Terminal</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content" style="padding: 12px 20px;">
+npm create nuxt@latest &lt;project-name&gt;
+                    </div>
+                </div>
+
+                <div class="info-box" style="margin-top: 15px; background-color: rgba(255, 255, 255, 0.02); border-color: var(--border-color); color: var(--text-muted);">
+                    <div style="width: 100%;">
+                        <p data-en="During installation, the CLI will ask you a few questions:" data-kh="ក្នុងអំឡុងពេលដំឡើង CLI នឹងសួរអ្នកនូវសំណួរមួយចំនួន៖" style="margin-bottom: 8px; color: var(--text-main); font-weight: 500;">During installation, the CLI will ask you a few questions:</p>
+                        <ul style="margin-left: 24px; line-height: 1.8;">
+                            <li><span data-en="<strong>Which template?</strong> Choose <code>minimal</code> for a clean starter." data-kh="<strong>Which template?</strong> ជ្រើសរើសយក <code>minimal</code> សម្រាប់គម្រោងទទេស្អាត។"><strong>Which template?</strong> Choose <code>minimal</code> for a clean starter.</span></li>
+                            <li><span data-en="<strong>Package Manager:</strong> It is recommended to choose <code>npm</code>." data-kh="<strong>Package Manager:</strong> គួរតែជ្រើសរើសយក <code>npm</code> ។"><strong>Package Manager:</strong> It is recommended to choose <code>npm</code>.</span></li>
+                            <li><span data-en="<strong>Initialize Git Repository?</strong> Choose <code>Yes</code> or <code>No</code>." data-kh="<strong>Initialize Git Repository?</strong> ជ្រើសរើសយក <code>Yes</code> ឬ <code>No</code> ។"><strong>Initialize Git Repository?</strong> Choose <code>Yes</code> or <code>No</code>.</span></li>
+                            <li><span data-en="<strong>Browse and install modules?</strong> Choose <code>No</code> for now." data-kh="<strong>Browse and install modules?</strong> ជ្រើសរើសយក <code>No</code> សិនទៅ។"><strong>Browse and install modules?</strong> Choose <code>No</code> for now.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-window" style="margin-top: 20px;">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">💻</span> <span data-en="Terminal Output Example" data-kh="ឧទាហរណ៍នៃការបង្ហាញនៅលើ Terminal">Terminal Output Example</span></div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content" style="padding: 20px; font-size: 13px; line-height: 1.4;">
+<pre style="font-family: monospace; color: #e2e8f0; margin: 0; white-space: pre-wrap;">
+<span style="color: #00DC82; font-weight: 900;">        .d$b.
+      i$$A$$L  .d$b
+    .$$F` `$$L.$$A$$.
+   j$$'    `4$$:` `$$.
+  j$$'      .4$:    `$$.
+ j$$`       .$$:      `4$L
+:$$:_____.d$$:  _____:$$:
+`4$$$$$$$P` .i$$$$$$$P`</span>
+
+<span style="color: #00DC82;">T</span>  <span style="color: #00DC82; font-weight: bold;">Welcome to Nuxt!</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Templates loaded
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Which template would you like to use?
+<span style="color: #4b5563;">|</span>  <span style="color: #94a3b8;">minimal - Minimal starter with a single app.vue.</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Creating project in <span style="color: #3b82f6;">nuxt-app</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Downloaded <span style="color: #3b82f6;">minimal</span> template
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Which package manager would you like to use?
+<span style="color: #4b5563;">|</span>  <span style="color: #94a3b8;">npm</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Initialize git repository?
+<span style="color: #4b5563;">|</span>  <span style="color: #94a3b8;">Yes</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Dependencies installed
+<span style="color: #4b5563;">|</span>
+<span style="color: #00DC82;">o</span>  Would you like to browse and install modules?
+<span style="color: #4b5563;">|</span>  <span style="color: #94a3b8;">No</span>
+<span style="color: #4b5563;">|</span>
+<span style="color: #4b5563;">-</span>  <span style="color: #facc15;">✨</span> Nuxt project has been created with the <span style="color: #3b82f6;">minimal</span> template.
+
+<span style="color: #00DC82;">+---</span> <span style="color: #facc15;">👉</span> Next steps <span style="color: #00DC82;">---+</span>
+<span style="color: #00DC82;">|</span>                     <span style="color: #00DC82;">|</span>
+<span style="color: #00DC82;">|</span>  <span style="color: #e2e8f0;">&gt; <span style="color: #3b82f6;">cd nuxt-app</span></span>      <span style="color: #00DC82;">|</span>
+<span style="color: #00DC82;">|</span>  <span style="color: #e2e8f0;">&gt; <span style="color: #3b82f6;">npm run dev</span></span>      <span style="color: #00DC82;">|</span>
+<span style="color: #00DC82;">|</span>                     <span style="color: #00DC82;">|</span>
+<span style="color: #00DC82;">+---------------------+</span>
+</pre>
+                    </div>
+                </div>
+
+                <h2 data-en="2. Install dependencies" data-kh="2. ដំឡើង Dependencies">2. Install dependencies</h2>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">💻</span> Terminal</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content" style="padding: 12px 20px;">
+<span class="function">cd</span> &lt;project-name&gt;
+<span class="function">npm</span> install
+                    </div>
+                </div>
+
+                <h2 data-en="3. Start development server" data-kh="3. ចាប់ផ្តើមដំណើរការ Server">3. Start development server</h2>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">💻</span> Terminal</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content" style="padding: 12px 20px;">
+<span class="function">npm</span> run dev
+                    </div>
+                </div>
+
+                <div class="info-box" style="background-color: rgba(0, 220, 130, 0.1); border-color: rgba(0, 220, 130, 0.2); color: #00DC82;">
+                    <span data-en="<strong>Success!</strong> Your Nuxt application is now running on <code>http://localhost:3000</code>." data-kh="<strong>ជោគជ័យ!</strong> កម្មវិធី Nuxt របស់អ្នកកំពុងដំណើរការនៅលើ <code>http://localhost:3000</code> ។">
+                    <strong>Success!</strong> Your Nuxt application is now running on <code>http://localhost:3000</code>.
+                    </span>
+                </div>
+            </div>
+
+            <!-- Project Structure -->
+            <div class="content-section" id="structure">
+                <div class="super-title" data-en="Structure" data-kh="រចនាសម្ព័ន្ធ">Structure</div>
+                <h1 data-en="Project Structure" data-kh="រចនាសម្ព័ន្ធគម្រោង">Project Structure</h1>
+                <p data-en="Nuxt 4 introduces a refined directory structure, utilizing an <code>app/</code> directory by default to cleanly separate your frontend code from configuration and server logic." data-kh="Nuxt 4 ណែនាំរចនាសម្ព័ន្ធឯកសារថ្មី ដោយប្រើថត <code>app/</code> ជាលំនាំដើមដើម្បីបំបែកកូដ frontend របស់អ្នកពី logic ម៉ាស៊ីនមេនិងឯកសារ config យ៉ាងស្អាត។">Nuxt 4 introduces a refined directory structure, utilizing an <code>app/</code> directory by default to cleanly separate your frontend code from configuration and server logic.</p>
+                
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">◬</span> my-nuxt-app</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+my-nuxt-app/
+├── app/                  <span class="comment" data-en="// Frontend Vue application" data-kh="// Frontend Vue application">// Frontend Vue application</span>
+│   ├── pages/
+│   ├── components/
+│   ├── layouts/
+│   ├── middleware/
+│   └── composables/
+├── server/               <span class="comment" data-en="// Backend API and Nitro routes" data-kh="// Backend API និង Nitro">// Backend API and Nitro routes</span>
+├── shared/               <span class="comment" data-en="// Types/utils shared between app & server" data-kh="// មុខងារប្រើរួមគ្នារវាង app និង server">// Types/utils shared between app & server</span>
+├── public/               <span class="comment" data-en="// Static assets" data-kh="// ឯកសារថេរ (រូបភាព...)">// Static assets</span>
+└── nuxt.config.ts        <span class="comment" data-en="// Main configuration file" data-kh="// ឯកសារកំណត់រចនាសម្ព័ន្ធចម្បង">// Main configuration file</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <h3 data-en="📦 The app/ Directory" data-kh="📦 Folder app/">📦 The <code>app/</code> Directory</h3>
+                    <p data-en="This is the heart of your frontend application. Nuxt 4 moved all the standard Vue files (like pages, components, layouts, plugins, and composables) inside this single directory. This clean separation ensures your frontend code doesn't mix with backend logic, making large projects much easier to navigate and maintain." data-kh="នេះគឺជាបេះដូងនៃកម្មវិធីផ្នែកខាងមុខ (Frontend) របស់អ្នក។ Nuxt 4 បានផ្លាស់ប្តូរឯកសារ Vue ស្តង់ដារទាំងអស់ (ដូចជា pages, components, layouts) ទៅខាងក្នុងថតតែមួយនេះ។ ការបំបែកយ៉ាងច្បាស់លាស់នេះធានាថាកូដផ្នែកខាងមុខរបស់អ្នកមិនលាយឡំជាមួយ logic ផ្នែកខាងក្រោយឡើយ។">This is the heart of your frontend application. Nuxt 4 moved all the standard Vue files (like pages, components, layouts, plugins, and composables) inside this single directory. This clean separation ensures your frontend code doesn't mix with backend logic, making large projects much easier to navigate and maintain.</p>
+
+                    <h3 data-en="🌐 The server/ Directory" data-kh="🌐 ថត server/" style="margin-top: 24px;">🌐 The <code>server/</code> Directory</h3>
+                    <p data-en="Powered by the blazing-fast Nitro engine, this folder allows you to build a complete backend API directly within your Nuxt project. Any file you create in <code>server/api/</code> automatically becomes an API endpoint. You can connect to databases, handle authentication, and write server-side middleware here." data-kh="ដំណើរការដោយ Nitro engine ដ៏លឿនបំផុត ថតនេះអនុញ្ញាតឱ្យអ្នកបង្កើត API ផ្នែកខាងក្រោយ (Backend) ពេញលេញដោយផ្ទាល់នៅក្នុងគម្រោង Nuxt របស់អ្នក។ រាល់ឯកសារដែលអ្នកបង្កើតនៅក្នុង <code>server/api/</code> នឹងក្លាយជា API endpoint ដោយស្វ័យប្រវត្តិ។">Powered by the blazing-fast Nitro engine, this folder allows you to build a complete backend API directly within your Nuxt project. Any file you create in <code>server/api/</code> automatically becomes an API endpoint. You can connect to databases, handle authentication, and write server-side middleware here.</p>
+
+                    <h3 data-en="🤝 The shared/ Directory" data-kh="🤝 ថត shared/" style="margin-top: 24px;">🤝 The <code>shared/</code> Directory</h3>
+                    <p data-en="A highly requested feature in Nuxt 4! The <code>shared/</code> directory is used for code that needs to be accessed by both your Vue frontend and your Nitro backend. It is the perfect place to store shared TypeScript interfaces, Zod validation schemas, and common utility functions, ensuring complete type safety across your entire stack." data-kh="នេះជាមុខងារថ្មីដ៏អស្ចារ្យនៅក្នុង Nuxt 4! ថត <code>shared/</code> ត្រូវបានប្រើសម្រាប់កូដដែលត្រូវប្រើប្រាស់ទាំងនៅក្នុង Vue frontend និង Nitro backend របស់អ្នក។ វាជាកន្លែងដ៏ល្អឥតខ្ចោះសម្រាប់រក្សាទុក TypeScript interfaces ប្រើរួមគ្នា និង functions ផ្សេងៗ។">A highly requested feature in Nuxt 4! The <code>shared/</code> directory is used for code that needs to be accessed by both your Vue frontend and your Nitro backend. It is the perfect place to store shared TypeScript interfaces, Zod validation schemas, and common utility functions, ensuring complete type safety across your entire stack.</p>
+
+                    <h3 data-en="⚙️ The nuxt.config.ts File" data-kh="⚙️ ឯកសារ nuxt.config.ts" style="margin-top: 24px;">⚙️ The <code>nuxt.config.ts</code> File</h3>
+                    <p data-en="This single file controls your entire application's behavior. Instead of juggling separate configuration files for Webpack/Vite, PostCSS, or Vue Router, you handle everything here. You can easily register Nuxt modules (like Tailwind or Pinia), define global environment variables, and configure rendering modes (SSR, SPA, or SSG) with just a few lines of code." data-kh="ឯកសារតែមួយនេះគ្រប់គ្រងដំណើរការកម្មវិធីទាំងមូលរបស់អ្នក។ ជំនួសឱ្យការប្រើប្រាស់ឯកសារ configuration ច្រើនដាច់ដោយឡែកពីគ្នា អ្នកអាចគ្រប់គ្រងអ្វីៗគ្រប់យ៉ាងនៅទីនេះ។ អ្នកអាចបន្ថែម Nuxt modules និងកំណត់របៀប rendering យ៉ាងងាយស្រួល។">This single file controls your entire application's behavior. Instead of juggling separate configuration files for Webpack/Vite, PostCSS, or Vue Router, you handle everything here. You can easily register Nuxt modules (like Tailwind or Pinia), define global environment variables, and configure rendering modes (SSR, SPA, or SSG) with just a few lines of code.</p>
+                </div>
+            </div>
+
+            <!-- Inside App -->
+            <div class="content-section" id="app-dir">
+                <div class="super-title" data-en="Structure" data-kh="រចនាសម្ព័ន្ធ">Structure</div>
+                <h1 data-en="Inside app/ Directory" data-kh="ខាងក្នុងថត app/">Inside <code>app/</code> Directory</h1>
+                <p data-en="The <code>app/</code> directory contains the core of your Vue.js frontend application." data-kh="ថត <code>app/</code> ផ្ទុកនូវផ្នែកសំខាន់បំផុតនៃកម្មវិធី Vue.js របស់អ្នក។">The <code>app/</code> directory contains the core of your Vue.js frontend application.</p>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>📄 pages/</h4>
+                        <p data-en="Vue components here automatically become your application's URLs (routes). No router config needed." data-kh="Components នៅទីនេះក្លាយជា URLs (routes) នៃកម្មវិធីរបស់អ្នកដោយស្វ័យប្រវត្តិ។">Vue components here automatically become your application's URLs (routes). No router config needed.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🧩 components/</h4>
+                        <p data-en="Reusable Vue UI components. Nuxt auto-imports these so you can use them directly in templates." data-kh="Reusable Vue UI components។ Nuxt auto-imports វាដោយស្វ័យប្រវត្តិ។">Reusable Vue UI components. Nuxt auto-imports these so you can use them directly in templates.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🖼️ layouts/</h4>
+                        <p data-en="Wrappers for your pages (like a Header and Footer) that persist across route changes without re-rendering." data-kh="Layouts សម្រាប់ទំព័ររបស់អ្នក (ដូចជា Header និង Footer) ដែលរក្សាទម្រង់មិនប្រែប្រួលពេលប្តូរទំព័រ (route changes)។">Wrappers for your pages (like a Header and Footer) that persist across route changes without re-rendering.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🧠 composables/</h4>
+                        <p data-en="Reusable stateful logic and Vue composables. Auto-imported globally for use anywhere in your app." data-kh="Reusable stateful logic និង Vue composables។ Auto-imported នៅទូទាំងកម្មវិធី។">Reusable stateful logic and Vue composables. Auto-imported globally for use anywhere in your app.</p>
+                    </div>
+                     <div class="card">
+                        <h4>🛡️ middleware/</h4>
+                        <p data-en="Route guards. Run code before navigating to a particular page (e.g., redirecting unauthenticated users)." data-kh="Route guards។ ដំណើរការកូដមុនពេលចូលទៅកាន់ទំព័រណាមួយ (ឧទាហរណ៍ redirecting unauthenticated users)។">Route guards. Run code before navigating to a particular page (e.g., redirecting unauthenticated users).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Root Dir -->
+            <div class="content-section" id="root-dir">
+                <div class="super-title" data-en="Structure" data-kh="រចនាសម្ព័ន្ធ">Structure</div>
+                <h1 data-en="Root Directories" data-kh="ថតឫសគល់ (Root Directories)">Root Directories</h1>
+                <p data-en="Outside of the <code>app/</code> directory, Nuxt manages your backend, shared code, and static assets." data-kh="នៅខាងក្រៅថត <code>app/</code>, Nuxt គ្រប់គ្រង backend របស់អ្នក, កូដប្រើរួមគ្នា, និងឯកសារថេរ។">Outside of the <code>app/</code> directory, Nuxt manages your backend, shared code, and static assets.</p>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h4>🌐 server/</h4>
+                        <p data-en="Powered by the Nitro engine. Create backend APIs, server routes, and server middleware completely separate from the Vue app." data-kh="បង្កើត Backend APIs, Server routes, និង Server middleware ដោយឡែកពីកម្មវិធី Vue។">Powered by the Nitro engine. Create backend APIs, server routes, and server middleware completely separate from the Vue app.</p>
+                    </div>
+                    <div class="card">
+                        <h4>🤝 shared/</h4>
+                        <p data-en="A new feature in Nuxt 4. Code placed here is auto-imported in both your Vue app and server API." data-kh="លក្ខណៈពិសេសថ្មីនៅក្នុង Nuxt 4។ កូដនៅទីនេះត្រូវបាននាំចូលដោយស្វ័យប្រវត្តិនៅក្នុងទាំងកម្មវិធី Vue និង Server API របស់អ្នក។">A new feature in Nuxt 4. Code placed here is auto-imported in both your Vue app and server API.</p>
+                    </div>
+                    <div class="card">
+                        <h4>📁 public/</h4>
+                        <p data-en="Static files (favicon.ico, robots.txt, images) that are served directly at the root URL without processing." data-kh="ឯកសារថេរដែលត្រូវបានបម្រើដោយផ្ទាល់នៅ root URL ដោយមិនឆ្លងកាត់ការកែច្នៃ។">Static files (favicon.ico, robots.txt, images) that are served directly at the root URL without processing.</p>
+                    </div>
+                    <div class="card">
+                        <h4>⚙️ nuxt.config.ts</h4>
+                        <p data-en="The central configuration file where you register modules, configure build tools, and set global meta tags." data-kh="ឯកសារ Configuration កណ្តាល ដែលអ្នកចុះឈ្មោះ Modules និងកំណត់ការកំណត់ផ្សេងៗ។">The central configuration file where you register modules, configure build tools, and set global meta tags.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Routing -->
+            <div class="content-section" id="routing">
+                <div class="super-title" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <h1 data-en="Routing" data-kh="Routing">Routing</h1>
+                <p data-en="One core feature of Nuxt is the file system router. Every Vue file inside the <code>app/pages/</code> directory creates a corresponding URL (or route) that displays the contents of the file." data-kh="លក្ខណៈពិសេសស្នូលមួយរបស់ Nuxt គឺ File System Router។ រាល់ឯកសារ Vue ទាំងអស់នៅក្នុងថត <code>app/pages/</code> នឹងបង្កើត URL (ឬ Route) ដែលត្រូវគ្នាដោយស្វ័យប្រវត្តិ។">One core feature of Nuxt is the file system router. Every Vue file inside the <code>app/pages/</code> directory creates a corresponding URL (or route) that displays the contents of the file.</p>
+                
+                <p data-en="No need to manually create a Vue Router configuration. Nuxt generates it under the hood." data-kh="មិនចាំបាច់បង្កើត Vue Router configuration ដោយដៃទេ។ Nuxt បង្កើតវាដោយស្វ័យប្រវត្តិ។">No need to manually create a Vue Router configuration. Nuxt generates it under the hood.</p>
+
+                <div class="code-window" style="margin-top: 24px;">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">◬</span> <span data-en="Directory Mapping" data-kh="Directory Mapping">Directory Mapping</span></div>
+                    </div>
+                    <div class="code-content">
+app/pages/
+├── index.vue      <span class="comment" data-en="// Maps to -> /" data-kh="// Maps to -> /">// Maps to -> /</span>
+├── about.vue      <span class="comment" data-en="// Maps to -> /about" data-kh="// Maps to -> /about">// Maps to -> /about</span>
+└── products.vue   <span class="comment" data-en="// Maps to -> /products" data-kh="// Maps to -> /products">// Maps to -> /products</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px;">
+                    <h3 data-en="🏠 Home Page (index.vue)" data-kh="🏠 ទំព័រដើម (index.vue)">🏠 Home Page (<code>index.vue</code>)</h3>
+                    <p data-en="The <code>index.vue</code> file automatically maps to the root URL (<code>/</code>). This is your homepage." data-kh="ឯកសារ <code>index.vue</code> នឹងភ្ជាប់ទៅកាន់ root URL (<code>/</code>) ដោយស្វ័យប្រវត្តិ។ នេះគឺជាទំព័រដើមរបស់អ្នក។">The <code>index.vue</code> file automatically maps to the root URL (<code>/</code>). This is your homepage.</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-header-left"><span class="icon">📄</span> app/pages/index.vue</div>
+                            <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                        </div>
+                        <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>Welcome to the Home Page<span class="keyword">&lt;/h1&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                        </div>
+                    </div>
+
+                    <!-- Browser Mockup for Home -->
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                        <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                            <div style="display: flex; gap: 6px; margin-right: 16px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                            </div>
+                            <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                                localhost:3000/
+                            </div>
+                        </div>
+                        <div style="padding: 24px; text-align: left;">
+                            <h1 style="color: #0f172a; margin: 0; font-size: 2em; border: none; padding: 0;">Welcome to the Home Page</h1>
+                        </div>
+                    </div>
+
+                    <h3 data-en="ℹ️ About Page (about.vue)" data-kh="ℹ️ ទំព័រអំពីយើង (about.vue)" style="margin-top: 24px;">ℹ️ About Page (<code>about.vue</code>)</h3>
+                    <p data-en="Any other file name becomes a route with that exact name. <code>about.vue</code> becomes the <code>/about</code> URL." data-kh="ឈ្មោះឯកសារផ្សេងទៀតក្លាយជា route ជាមួយឈ្មោះនោះតែម្តង។ <code>about.vue</code> ក្លាយជា URL <code>/about</code> ។">Any other file name becomes a route with that exact name. <code>about.vue</code> becomes the <code>/about</code> URL.</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-header-left"><span class="icon">📄</span> app/pages/about.vue</div>
+                            <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                        </div>
+                        <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>About Us<span class="keyword">&lt;/h1&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                        </div>
+                    </div>
+
+                    <!-- Browser Mockup for About -->
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                        <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                            <div style="display: flex; gap: 6px; margin-right: 16px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                            </div>
+                            <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                                localhost:3000/about
+                            </div>
+                        </div>
+                        <div style="padding: 24px; text-align: left;">
+                            <h1 style="color: #0f172a; margin: 0; font-size: 2em; border: none; padding: 0;">About Us</h1>
+                        </div>
+                    </div>
+
+                    <h3 data-en="🛍️ Products Page (products.vue)" data-kh="🛍️ ទំព័រផលិតផល (products.vue)" style="margin-top: 24px;">🛍️ Products Page (<code>products.vue</code>)</h3>
+                    <p data-en="Similarly, <code>products.vue</code> creates the <code>/products</code> URL." data-kh="ដូចគ្នាដែរ <code>products.vue</code> បង្កើត URL <code>/products</code> ។">Similarly, <code>products.vue</code> creates the <code>/products</code> URL.</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-header-left"><span class="icon">📄</span> app/pages/products.vue</div>
+                            <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                        </div>
+                        <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>Our Products<span class="keyword">&lt;/h1&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                        </div>
+                    </div>
+
+                    <!-- Browser Mockup for Products -->
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                        <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                            <div style="display: flex; gap: 6px; margin-right: 16px;">
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                                <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                            </div>
+                            <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                                localhost:3000/products
+                            </div>
+                        </div>
+                        <div style="padding: 24px; text-align: left;">
+                            <h1 style="color: #0f172a; margin: 0; font-size: 2em; border: none; padding: 0;">Our Products</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 40px 0;">
+
+                <h2 data-en="Enabling the Router (app.vue)" data-kh="ការបើកដំណើរការ Router (app.vue)">Enabling the Router (<code>app.vue</code>)</h2>
+                <div class="info-box" style="margin-bottom: 16px; background-color: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.3); color: #ffc107;">
+                    <div style="width: 100%;">
+                        <span data-en="<strong>Crucial Step:</strong> To enable page routing, you must add the <code>&amp;lt;NuxtPage /&amp;gt;</code> component inside your main <code>app.vue</code> file. This component acts as an outlet, telling Nuxt exactly where to display the current page's content." data-kh="<strong>ជំហានសំខាន់៖</strong> ដើម្បីបើកដំណើរការ pages routing អ្នកត្រូវតែបន្ថែម <code>&amp;lt;NuxtPage /&amp;gt;</code> នៅក្នុងឯកសារ <code>app.vue</code> ចម្បងរបស់អ្នក។ នេះជាការប្រាប់ Nuxt ពីទីតាំងដែលត្រូវបង្ហាញទំព័រ។">
+                        <strong>Crucial Step:</strong> To enable page routing, you must add the <code>&lt;NuxtPage /&gt;</code> component inside your main <code>app.vue</code> file. This component acts as an outlet, telling Nuxt exactly where to display the current page's content.
+                        </span>
+                    </div>
+                </div>
+                
+                <p data-en="By default, a new Nuxt project comes with a Welcome screen. You need to replace it with <code>&amp;lt;NuxtPage /&amp;gt;</code> to see your own pages:" data-kh="តាមលំនាំដើម គម្រោង Nuxt ថ្មីមកជាមួយទំព័រស្វាគមន៍ស្រាប់។ អ្នកត្រូវជំនួសវាដោយ <code>&amp;lt;NuxtPage /&amp;gt;</code> ដើម្បីមើលឃើញទំព័ររបស់អ្នក៖">By default, a new Nuxt project comes with a Welcome screen. You need to replace it with <code>&lt;NuxtPage /&gt;</code> to see your own pages:</p>
+
+                <div class="code-window" style="margin-bottom: 32px; border-color: rgba(255, 193, 7, 0.3);">
+                    <div class="code-header" style="background: rgba(255, 193, 7, 0.05); border-color: rgba(255, 193, 7, 0.3);">
+                        <div class="code-header-left"><span class="icon" style="color: #ffc107;">⚠️</span> app.vue</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="comment" data-en="&lt;!-- Displays the active page based on the URL --&gt;" data-kh="&lt;!-- បង្ហាញទំព័រសកម្មដោយផ្អែកលើ URL --&gt;">&lt;!-- Displays the active page based on the URL --&gt;</span>
+    <span class="keyword">&lt;</span><span class="function">NuxtPage</span> <span class="keyword">/&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 data-en="❓ What is it?" data-kh="❓ តើវាជាអ្វី?">❓ What is it?</h3>
+                    <p data-en="<code>&amp;lt;NuxtPage /&amp;gt;</code> is a built-in Vue component provided by Nuxt. It acts as a dynamic placeholder." data-kh="<code>&amp;lt;NuxtPage /&amp;gt;</code> គឺជា Vue component ដែលភ្ជាប់មកជាមួយស្រាប់ក្នុង Nuxt។ វាដើរតួជាកន្លែងទំនេរមួយសម្រាប់បង្ហាញទិន្នន័យ (placeholder)។"><code>&lt;NuxtPage /&gt;</code> is a built-in Vue component provided by Nuxt. It acts as a dynamic placeholder.</p>
+                    
+                    <h3 data-en="⚙️ How does it work?" data-kh="⚙️ តើវាដំណើរការយ៉ាងដូចម្តេច?" style="margin-top: 24px;">⚙️ How does it work?</h3>
+                    <p data-en="When a user visits a URL (like <code>/about</code>), Nuxt looks inside the <code>app/pages/</code> folder, finds <code>about.vue</code>, and injects its content directly where <code>&amp;lt;NuxtPage /&amp;gt;</code> is placed." data-kh="នៅពេលអ្នកប្រើចូលទៅកាន់ URL (ឧ. <code>/about</code>) Nuxt នឹងស្វែងរកឯកសារ <code>about.vue</code> ក្នុងថត <code>app/pages/</code> រួចទាញយកទិន្នន័យរបស់វាមកបង្ហាញត្រង់កន្លែងដែលមាន <code>&amp;lt;NuxtPage /&amp;gt;</code> ។">When a user visits a URL (like <code>/about</code>), Nuxt looks inside the <code>app/pages/</code> folder, finds <code>about.vue</code>, and injects its content directly where <code>&lt;NuxtPage /&gt;</code> is placed.</p>
+                    
+                    <h3 data-en="⚠️ Why is it needed?" data-kh="⚠️ ហេតុអ្វីបានជាវាចាំបាច់?" style="margin-top: 24px;">⚠️ Why is it needed?</h3>
+                    <p data-en="Without it, Nuxt doesn't know <em>where</em> on the screen to render your pages. By using this placeholder, you can easily place global UI elements—like a Navbar <em>above</em> it, and a Footer <em>below</em> it—inside <code>app.vue</code>, and they will persist across all pages." data-kh="បើគ្មានវាទេ Nuxt មិនដឹងថាត្រូវបង្ហាញទំព័ររបស់អ្នកនៅទីតាំងណានៃអេក្រង់ឡើយ។ ដោយប្រើ placeholder នេះ អ្នកអាចដាក់ Navbar នៅ<em>ពីលើ</em>វា និង Footer នៅ<em>ពីក្រោម</em>វាបានយ៉ាងងាយស្រួល នៅក្នុងឯកសារ <code>app.vue</code> ហើយវានឹងបង្ហាញនៅលើគ្រប់ទំព័រទាំងអស់។">Without it, Nuxt doesn't know <em>where</em> on the screen to render your pages. By using this placeholder, you can easily place global UI elements—like a Navbar <em>above</em> it, and a Footer <em>below</em> it—inside <code>app.vue</code>, and they will persist across all pages.</p>
+                </div>
+            </div>
+
+            <!-- Dynamic Routing -->
+            <div class="content-section" id="dynamic">
+                <div class="super-title" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <h1 data-en="Dynamic Routes" data-kh="Dynamic Routes">Dynamic Routes</h1>
+                <p data-en="Nuxt supports dynamic routes using square brackets <code>[ ]</code> in the filename." data-kh="Nuxt គាំទ្រ Dynamic Routes ដោយប្រើវង់ក្រចកជ្រុង <code>[ ]</code> ក្នុងឈ្មោះឯកសារ។">Nuxt supports dynamic routes using square brackets <code>[ ]</code> in the filename.</p>
+
+                <div class="info-box" style="margin-bottom: 32px; background-color: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); color: #eab308;">
+                    <div style="width: 100%;">
+                        <strong data-en="🃏 The Wildcard Analogy:" data-kh="🃏 ការប្រៀបធៀបទៅនឹង Wildcard៖">🃏 The Wildcard Analogy:</strong>
+                        <p data-en="Imagine you have 1,000 products. Instead of creating 1,000 separate files (like <code>1.vue</code>, <code>2.vue</code>, etc.), you create <strong>one single file</strong> named <code>[id].vue</code>. The brackets tell Nuxt: <em>'Hey, whatever value the user types in the URL here, catch it and call it <code>id</code>'</em>." data-kh="ស្រមៃថាអ្នកមានផលិតផល 1,000 មុខ។ ជំនួសឲ្យការបង្កើតឯកសារដាច់ដោយឡែកចំនួន 1,000 (ដូចជា <code>1.vue</code>, <code>2.vue</code>, ជាដើម) អ្នកបង្កើត<strong>ឯកសារតែមួយគត់</strong>ឈ្មោះ <code>[id].vue</code>។ វង់ក្រចកប្រាប់ Nuxt ថា៖ <em>'ហេ! ទោះបីជាអ្នកប្រើវាយតម្លៃអ្វីក៏ដោយក្នុង URL នៅទីនេះ សូមចាប់យកវា ហើយហៅវាថា <code>id</code>'</em>។" style="margin: 8px 0 0 0; line-height: 1.6; color: var(--text-color);">
+                            Imagine you have 1,000 products. Instead of creating 1,000 separate files (like <code>1.vue</code>, <code>2.vue</code>, etc.), you create <strong>one single file</strong> named <code>[id].vue</code>. The brackets tell Nuxt: <em>"Hey, whatever value the user types in the URL here, catch it and call it <code>id</code>"</em>.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Visual URL Mapping Diagram -->
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 32px 0 48px 0; font-family: monospace;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 650px; background: #0f172a; padding: 16px 24px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <div style="font-size: 1.2em; color: #94a3b8;">/products/<span style="color: #eab308; font-weight: bold; background: rgba(234, 179, 8, 0.15); padding: 4px 8px; border-radius: 4px;">123</span></div>
+                        <div style="color: #475569; font-size: 1.5em; font-weight: bold;">➔</div>
+                        <div style="font-size: 1.1em; color: #e2e8f0; background: #1e293b; padding: 8px 16px; border-radius: 6px;">[id].vue  <span style="color: #94a3b8; font-size: 0.9em; margin-left: 12px;">(id = <span style="color: #eab308; font-weight: bold;">'123'</span>)</span></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 650px; background: #0f172a; padding: 16px 24px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <div style="font-size: 1.2em; color: #94a3b8;">/products/<span style="color: #38bdf8; font-weight: bold; background: rgba(56, 189, 248, 0.15); padding: 4px 8px; border-radius: 4px;">apple</span></div>
+                        <div style="color: #475569; font-size: 1.5em; font-weight: bold;">➔</div>
+                        <div style="font-size: 1.1em; color: #e2e8f0; background: #1e293b; padding: 8px 16px; border-radius: 6px;">[id].vue  <span style="color: #94a3b8; font-size: 0.9em; margin-left: 12px;">(id = <span style="color: #38bdf8; font-weight: bold;">'apple'</span>)</span></div>
+                    </div>
+                </div>
+                
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">◬</span> <span data-en="Directory Mapping" data-kh="Directory Mapping">Directory Mapping</span></div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+app/pages/
+└── products/
+    └── [id].vue   <span class="comment" data-en="// Maps to -> /products/1, /products/2, etc." data-kh="// Maps to -> /products/1, /products/2, etc.">// Maps to -> /products/1, /products/2, etc.</span>
+                    </div>
+                </div>
+
+                <h2 data-en="Accessing Route Parameters" data-kh="Accessing Route Parameters">Accessing Route Parameters</h2>
+                <p data-en="Inside your page, you can access the dynamic parameter (e.g., <code>id</code>) using the <code>useRoute()</code> composable." data-kh="នៅខាងក្នុងទំព័ររបស់អ្នក អ្នកអាចចូលប្រើប៉ារ៉ាម៉ែត្រ (ឧទាហរណ៍ <code>id</code>) ដោយប្រើ <code>useRoute()</code> ។">Inside your page, you can access the dynamic parameter (e.g., <code>id</code>) using the <code>useRoute()</code> composable.</p>
+
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📄</span> app/pages/products/[id].vue</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;script</span> <span class="function">setup</span> <span class="keyword">lang=</span><span class="string">"ts"</span><span class="keyword">&gt;</span>
+<span class="keyword">const</span> route <span class="keyword">=</span> <span class="function">useRoute</span>()
+
+<span class="comment" data-en="// When visiting /products/123, this logs '123'" data-kh="// When visiting /products/123, this logs '123'">// When visiting /products/123, this logs '123'</span>
+<span class="keyword">console</span>.<span class="function">log</span>(route.params.id)
+<span class="keyword">&lt;/script&gt;</span>
+
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>Product ID: {{ route.params.id }}<span class="keyword">&lt;/h1&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                    </div>
+                </div>
+
+                <!-- Browser Mockup for Dynamic Route -->
+                <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                    <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; gap: 6px; margin-right: 16px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                        </div>
+                        <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                            localhost:3000/products/123
+                        </div>
+                    </div>
+                    <div style="padding: 24px; text-align: left;">
+                        <h1 style="color: #0f172a; margin: 0; font-size: 2em; border: none; padding: 0;">Product ID: 123</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nested Routes -->
+            <div class="content-section" id="nested">
+                <div class="super-title" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <h1 data-en="Nested Routes" data-kh="Nested Routes">Nested Routes</h1>
+                <p data-en="Sometimes, you want multiple pages to share the same layout structure (like a common sidebar or dashboard menu). Instead of copying that code into every file, Nuxt allows you to create <strong>Nested Routes</strong>." data-kh="ពេលខ្លះ អ្នកចង់ឲ្យទំព័រជាច្រើនចែករំលែក Layout តែមួយ (ដូចជា Sidebar ឬ Dashboard ដូចគ្នា)។ ជំនួសឲ្យការចម្លងកូដនោះទៅគ្រប់ឯកសារ Nuxt អនុញ្ញាតឲ្យអ្នកបង្កើត <strong>Nested Routes</strong>។">Sometimes, you want multiple pages to share the same layout structure (like a common sidebar or dashboard menu). Instead of copying that code into every file, Nuxt allows you to create <strong>Nested Routes</strong>.</p>
+                
+                <div class="info-box" style="margin-bottom: 24px; background-color: rgba(14, 165, 233, 0.1); border-color: rgba(14, 165, 233, 0.3); color: #38bdf8;">
+                    <div style="width: 100%;">
+                        <strong data-en="🖼️ The Picture Frame Analogy:" data-kh="🖼️ ការប្រៀបធៀបទៅនឹងស៊ុមរូបថត៖">🖼️ The Picture Frame Analogy:</strong>
+                        <p data-en="Think of the <strong>Parent Component</strong> as a picture frame. The frame stays exactly the same on the wall, but you can swap out the <strong>Child Pages</strong> (the pictures inside the frame) just by navigating to a different URL." data-kh="ស្រមៃថា <strong>Parent Component</strong> គឺជាស៊ុមរូបថត។ ស៊ុមនៅដដែលជានិច្ចនៅលើជញ្ជាំង ប៉ុន្តែអ្នកអាចផ្លាស់ប្តូរ <strong>Child Pages</strong> (រូបថតនៅខាងក្នុងស៊ុម) គ្រាន់តែផ្លាស់ប្តូរ URL ប៉ុណ្ណោះ។" style="margin: 8px 0 0 0;">
+                            Think of the <strong>Parent Component</strong> as a picture frame. The frame stays exactly the same on the wall, but you can swap out the <strong>Child Pages</strong> (the pictures inside the frame) just by navigating to a different URL.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Technical Block Diagram -->
+                <div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center; justify-content: center; margin: 32px 0 48px 0; font-family: monospace;">
+                    <!-- Diagram 1 -->
+                    <div style="width: 260px; background: #0f172a; border: 2px solid #334155; border-radius: 8px; padding: 16px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
+                        <div style="color: #00DC82; font-weight: bold; margin-bottom: 12px; text-align: center; font-size: 1.1em;">parent.vue</div>
+                        
+                        <!-- Layout Element (e.g., Sidebar/Header) -->
+                        <div style="height: 24px; background: #1e293b; border-radius: 4px; margin-bottom: 12px;"></div>
+                        
+                        <!-- NuxtPage Injector -->
+                        <div style="border: 2px dashed #00DC82; background: rgba(0, 220, 130, 0.05); padding: 16px; border-radius: 6px; text-align: center;">
+                            <div style="color: #94a3b8; font-size: 0.9em; margin-bottom: 8px;">&lt;NuxtPage /&gt;</div>
+                            <div style="background: #38bdf8; color: #0f172a; font-weight: bold; padding: 12px 8px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                                child-one.vue
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 2.5em; color: #475569; font-weight: bold;">➔</div>
+                    
+                    <!-- Diagram 2 -->
+                    <div style="width: 260px; background: #0f172a; border: 2px solid #334155; border-radius: 8px; padding: 16px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);">
+                        <div style="color: #00DC82; font-weight: bold; margin-bottom: 12px; text-align: center; font-size: 1.1em;">parent.vue</div>
+                        
+                        <!-- Layout Element (e.g., Sidebar/Header) -->
+                        <div style="height: 24px; background: #1e293b; border-radius: 4px; margin-bottom: 12px;"></div>
+                        
+                        <!-- NuxtPage Injector -->
+                        <div style="border: 2px dashed #00DC82; background: rgba(0, 220, 130, 0.05); padding: 16px; border-radius: 6px; text-align: center;">
+                            <div style="color: #94a3b8; font-size: 0.9em; margin-bottom: 8px;">&lt;NuxtPage /&gt;</div>
+                            <div style="background: #f472b6; color: #0f172a; font-weight: bold; padding: 12px 8px; border-radius: 4px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                                child-two.vue
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 data-en="⚙️ How to set it up (3 Simple Steps):" data-kh="⚙️ របៀបរៀបចំវា (៣ ជំហានងាយៗ)៖" style="margin-bottom: 12px; margin-top: 32px;">⚙️ How to set it up (3 Simple Steps):</h3>
+                <ol style="color: var(--text-color); margin-bottom: 24px; line-height: 1.8; padding-left: 20px;">
+                    <li><span data-en="Create a parent file" data-kh="បង្កើតឯកសារមេ">Create a parent file</span> (e.g., <code>parent.vue</code>).</li>
+                    <li><span data-en="Create a folder with the <strong>exact same name</strong>" data-kh="បង្កើតថតដែលមាន<strong>ឈ្មោះដូចគ្នាពិតប្រាកដ</strong>">Create a folder with the <strong>exact same name</strong></span> (e.g., <code>parent/</code>).</li>
+                    <li><span data-en="Put your child files inside that folder" data-kh="ដាក់ឯកសារកូនរបស់អ្នកក្នុងថតនោះ">Put your child files inside that folder</span> (e.g., <code>child-one.vue</code>).</li>
+                </ol>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">◬</span> <span data-en="Directory Mapping" data-kh="Directory Mapping">Directory Mapping</span></div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+app/pages/
+├── parent.vue              <span class="comment" data-en="// Parent wrapper" data-kh="// Parent wrapper">// Parent wrapper</span>
+└── parent/
+    ├── index.vue           <span class="comment" data-en="// Maps to -> /parent" data-kh="// Maps to -> /parent">// Maps to -> /parent</span>
+    ├── child-one.vue       <span class="comment" data-en="// Maps to -> /parent/child-one" data-kh="// Maps to -> /parent/child-one">// Maps to -> /parent/child-one</span>
+    └── child-two.vue       <span class="comment" data-en="// Maps to -> /parent/child-two" data-kh="// Maps to -> /parent/child-two">// Maps to -> /parent/child-two</span>
+                    </div>
+                </div>
+
+                <div class="info-box" data-en="The <code>parent.vue</code> file must contain the <code>&amp;lt;NuxtPage /&amp;gt;</code> component for the child views to be rendered inside it." data-kh="ឯកសារ <code>parent.vue</code> ត្រូវតែមាន <code>&amp;lt;NuxtPage /&amp;gt;</code> component ដើម្បីឲ្យ Child views អាចបង្ហាញនៅខាងក្នុងវាបាន។" style="margin-bottom: 24px;">
+                    The <code>parent.vue</code> file must contain the <code>&lt;NuxtPage /&gt;</code> component for the child views to be rendered inside it.
+                </div>
+
+                <div class="code-window" style="margin-bottom: 24px;">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📄</span> app/pages/parent.vue</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div</span> <span class="function">style</span><span class="keyword">=</span><span class="string">"border: 2px dashed #00DC82; padding: 20px;"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>Parent Component<span class="keyword">&lt;/h1&gt;</span>
+    <span class="comment" data-en="&lt;!-- Child pages will be injected here! --&gt;" data-kh="&lt;!-- Child pages នឹងបង្ហាញនៅទីនេះ! --&gt;">&lt;!-- Child pages will be injected here! --&gt;</span>
+    <span class="keyword">&lt;</span><span class="function">NuxtPage</span> <span class="keyword">/&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                    </div>
+                </div>
+
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📄</span> app/pages/parent/child-one.vue</div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div</span> <span class="function">style</span><span class="keyword">=</span><span class="string">"background: #f1f5f9; padding: 20px;"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;h2&gt;</span>Child One Content<span class="keyword">&lt;/h2&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                    </div>
+                </div>
+
+                <!-- Browser Mockup for Nested Route -->
+                <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                    <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; gap: 6px; margin-right: 16px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                        </div>
+                        <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                            localhost:3000/parent/child-one
+                        </div>
+                    </div>
+                    <div style="padding: 24px; text-align: left;">
+                        <div style="border: 2px dashed #00DC82; padding: 20px; border-radius: 8px;">
+                            <h1 style="color: #0f172a; margin-top: 0; font-size: 1.8em; border: none; padding: 0;">Parent Component</h1>
+                            <div style="background: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 16px;">
+                                <h2 style="color: #334155; margin: 0; font-size: 1.4em; border: none; padding: 0;">Child One Content</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Auto Imports -->
+            <div class="content-section" id="auto-imports">
+                <div class="super-title" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <h1 data-en="Auto Imports" data-kh="Auto Imports">Auto Imports</h1>
+                <p data-en="Nuxt automatically imports Vue APIs, your components, and composables. This means you don't need to write manual <code>import</code> statements, significantly reducing boilerplate code." data-kh="Nuxt ធ្វើការ Auto imports នូវ Vue APIs, Components របស់អ្នក និង Composables ដោយស្វ័យប្រវត្តិ។ នេះមានន័យថាអ្នកមិនចាំបាច់សរសេរ <code>import</code> ដោយដៃទៀតទេ ដែលកាត់បន្ថយកូដស្ទួនបានយ៉ាងច្រើន។">Nuxt automatically imports Vue APIs, your components, and composables. This means you don't need to write manual <code>import</code> statements, significantly reducing boilerplate code.</p>
+                
+                <div class="info-box" style="margin-bottom: 32px;">
+                    <div style="width: 100%;">
+                        <strong data-en="💡 What gets auto-imported?" data-kh="💡 តើមានអ្វីខ្លះត្រូវបាន Auto-import?">💡 What gets auto-imported?</strong>
+                        <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: var(--text-color);">
+                            <li data-en="Vue APIs (like <code>ref</code>, <code>computed</code>, <code>watch</code>)" data-kh="Vue APIs (ដូចជា <code>ref</code>, <code>computed</code>, <code>watch</code>)">Vue APIs (like <code>ref</code>, <code>computed</code>, <code>watch</code>)</li>
+                            <li data-en="Vue Router APIs (like <code>useRoute</code>, <code>useRouter</code>)" data-kh="Vue Router APIs (ដូចជា <code>useRoute</code>, <code>useRouter</code>)">Vue Router APIs (like <code>useRoute</code>, <code>useRouter</code>)</li>
+                            <li data-en="Any file inside the <code>components/</code>, <code>composables/</code>, and <code>utils/</code> directories" data-kh="គ្រប់ឯកសារទាំងអស់ក្នុងថត <code>components/</code>, <code>composables/</code>, និង <code>utils/</code>">Any file inside the <code>components/</code>, <code>composables/</code>, and <code>utils/</code> directories</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Visual Auto Import Engine Diagram -->
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 48px 0; font-family: monospace;">
+                    <div style="display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center;">
+                        <div style="background: #1e293b; padding: 12px 24px; border-radius: 8px; border: 1px solid #334155; color: #4ade80; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Vue APIs</div>
+                        <div style="background: #1e293b; padding: 12px 24px; border-radius: 8px; border: 1px solid #334155; color: #60a5fa; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">components/</div>
+                        <div style="background: #1e293b; padding: 12px 24px; border-radius: 8px; border: 1px solid #334155; color: #f472b6; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">composables/</div>
+                    </div>
+                    
+                    <div style="font-size: 2em; color: #475569;">↓</div>
+                    
+                    <div style="background: linear-gradient(135deg, #00DC82, #3b82f6); padding: 3px; border-radius: 12px; margin-top: 16px; box-shadow: 0 10px 25px -5px rgba(0, 220, 130, 0.4);">
+                        <div style="background: #0f172a; padding: 16px 48px; border-radius: 9px; text-align: center;">
+                            <div style="font-size: 1.4em; font-weight: bold; color: white;">Nuxt Auto-Import Engine ✨</div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 2em; color: #475569; margin: 16px 0;">↓</div>
+                    
+                    <div style="background: #1e293b; padding: 16px 48px; border-radius: 8px; border: 2px dashed #00DC82; color: #00DC82; font-weight: bold;">
+                        Ready to use anywhere in your app!
+                    </div>
+                </div>
+
+                <div class="code-window" style="border-color: #334155;">
+                    <div class="code-header" style="background: rgba(255,0,0,0.1); border-color: #334155;">
+                        <div class="code-header-left"><span style="color: #f87171; margin-right: 8px;">❌</span> <span data-en="Without Auto Imports (Plain Vue)" data-kh="Without Auto Imports (Plain Vue)">Without Auto Imports (Plain Vue)</span></div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;script</span> <span class="function">setup</span> <span class="keyword">lang=</span><span class="string">"ts"</span><span class="keyword">&gt;</span>
+<span class="comment" data-en="// ❌ Manual imports clutter your file" data-kh="// ❌ ការ import ដោយដៃធ្វើឲ្យឯកសារអ្នករញ៉េរញ៉ៃ">// ❌ Manual imports clutter your file</span>
+<span class="keyword">import</span> { ref, computed } <span class="keyword">from</span> <span class="string">'vue'</span>
+<span class="keyword">import</span> { useRoute } <span class="keyword">from</span> <span class="string">'vue-router'</span>
+<span class="keyword">import</span> MyComponent <span class="keyword">from</span> <span class="string">'~/components/MyComponent.vue'</span>
+
+<span class="keyword">const</span> count <span class="keyword">=</span> <span class="function">ref</span>(0)
+<span class="keyword">const</span> route <span class="keyword">=</span> <span class="function">useRoute</span>()
+<span class="keyword">&lt;/script&gt;</span>
+                    </div>
+                </div>
+
+                <div class="code-window" style="border-color: rgba(0, 220, 130, 0.4); margin-top: 24px;">
+                    <div class="code-header" style="background: rgba(0, 220, 130, 0.1); border-color: rgba(0, 220, 130, 0.2);">
+                        <div class="code-header-left"><span style="color: var(--accent); margin-right: 8px;">✅</span> <span data-en="With Nuxt Auto Imports" data-kh="With Nuxt Auto Imports">With Nuxt Auto Imports</span></div>
+                        <div class="copy-btn" data-en="Copy" data-kh="ចម្លង">Copy</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;script</span> <span class="function">setup</span> <span class="keyword">lang=</span><span class="string">"ts"</span><span class="keyword">&gt;</span>
+<span class="comment" data-en="// ✅ Look ma, no imports! Clean &amp; readable." data-kh="// ✅ មើលចុះ គ្មានកូដ import ទេ! ស្អាត និងងាយអាន។">// ✅ Look ma, no imports! Clean &amp; readable.</span>
+<span class="keyword">const</span> count <span class="keyword">=</span> <span class="function">ref</span>(0)
+<span class="keyword">const</span> route <span class="keyword">=</span> <span class="function">useRoute</span>()
+<span class="keyword">&lt;/script&gt;</span>
+                    </div>
+                </div>
+
+                <h2 data-en="How it works in practice:" data-kh="របៀបដែលវាដំណើរការជាក់ស្តែង៖" style="margin-top: 48px;">How it works in practice:</h2>
+                
+                <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: stretch; margin-bottom: 24px;">
+                    <!-- Component File -->
+                    <div class="code-window" style="flex: 1; min-width: 300px; margin: 0; border-color: #3b82f6;">
+                        <div class="code-header" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2);">
+                            <div class="code-header-left"><span class="icon">🧩</span> components/AppButton.vue</div>
+                        </div>
+                        <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;button</span> <span class="function">class</span><span class="keyword">=</span><span class="string">"btn"</span><span class="keyword">&gt;</span>Click Me<span class="keyword">&lt;/button&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+
+<span class="keyword">&lt;style</span> <span class="function">scoped</span><span class="keyword">&gt;</span>
+<span class="function">.btn</span> {
+  <span class="function">background</span>: <span class="string">#00DC82</span>;
+  <span class="function">color</span>: <span class="string">black</span>;
+  <span class="function">padding</span>: <span class="string">10px 20px</span>;
+  <span class="function">border-radius</span>: <span class="string">8px</span>;
+}
+<span class="keyword">&lt;/style&gt;</span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; font-size: 2em; color: #475569;">➔</div>
+
+                    <!-- Usage File -->
+                    <div class="code-window" style="flex: 1; min-width: 300px; margin: 0; border-color: #00DC82;">
+                        <div class="code-header" style="background: rgba(0, 220, 130, 0.1); border-color: rgba(0, 220, 130, 0.2);">
+                            <div class="code-header-left"><span class="icon">📄</span> app.vue <span style="color: #4ade80; margin-left: 8px; font-size: 0.9em;">(No import needed!)</span></div>
+                        </div>
+                        <div class="code-content">
+<span class="keyword">&lt;template&gt;</span>
+  <span class="keyword">&lt;div&gt;</span>
+    <span class="keyword">&lt;h1&gt;</span>Welcome to Nuxt<span class="keyword">&lt;/h1&gt;</span>
+    
+    <span class="comment" data-en="&lt;!-- Automatically recognized! --&gt;" data-kh="&lt;!-- ស្គាល់ដោយស្វ័យប្រវត្តិ! --&gt;">&lt;!-- Automatically recognized! --&gt;</span>
+    <span class="keyword">&lt;</span><span class="function">AppButton</span> <span class="keyword">/&gt;</span>
+  <span class="keyword">&lt;/div&gt;</span>
+<span class="keyword">&lt;/template&gt;</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Browser Mockup -->
+                <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: #fff; color: #000; margin-top: 16px;">
+                    <div style="background: #f1f5f9; padding: 8px 12px; display: flex; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; gap: 6px; margin-right: 16px;">
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #eab308;"></div>
+                            <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
+                        </div>
+                        <div style="background: #fff; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; color: #64748b; flex: 1; text-align: center; font-family: monospace; border: 1px solid #e2e8f0;">
+                            localhost:3000
+                        </div>
+                    </div>
+                    <div style="padding: 24px; text-align: left;">
+                        <h1 style="color: #0f172a; margin-top: 0;">Welcome to Nuxt</h1>
+                        <button style="background: #00DC82; color: black; padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; font-size: 1em; cursor: pointer; margin-top: 8px;">Click Me</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Big Picture -->
+            <div class="content-section" id="big-picture">
+                <div class="super-title" data-en="Guide" data-kh="ការណែនាំ">Guide</div>
+                <h1 data-en="The Big Picture" data-kh="The Big Picture">The Big Picture</h1>
+                <p data-en="Nuxt brings together the best tools in the Vue ecosystem and a powerful server engine to give you a complete full-stack framework." data-kh="Nuxt ប្រមូលផ្តុំឧបករណ៍ល្អៗបំផុតនៅក្នុងប្រព័ន្ធអេកូឡូស៊ីរបស់ Vue និងម៉ាស៊ីនមេដ៏មានឥទ្ធិពល ដើម្បីផ្តល់ឱ្យអ្នកនូវ Full-stack framework ពេញលេញមួយ។">Nuxt brings together the best tools in the Vue ecosystem and a powerful server engine to give you a complete full-stack framework.</p>
+                
+                <!-- Visual Architecture Diagram -->
+                <div style="display: flex; flex-direction: column; align-items: center; margin: 48px 0; font-family: 'Inter', sans-serif;">
+                    <!-- NUXT Header -->
+                    <div style="background: linear-gradient(135deg, #00DC82, #1e293b); padding: 16px 48px; border-radius: 12px; font-size: 2em; font-weight: bold; color: white; box-shadow: 0 10px 25px -5px rgba(0, 220, 130, 0.4); text-align: center; width: 100%; max-width: 800px; margin-bottom: 16px; position: relative; z-index: 2;">
+                        Nuxt Framework
+                    </div>
+                    
+                    <!-- Arrows connecting down -->
+                    <div style="display: flex; justify-content: space-around; width: 100%; max-width: 700px; margin-bottom: 16px; color: #475569; font-size: 2em;">
+                        <div>↓</div>
+                        <div>↓</div>
+                        <div>↓</div>
+                    </div>
+                    
+                    <!-- Core Pillars -->
+                    <div style="display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; width: 100%; max-width: 900px; margin-bottom: 24px;">
+                        <!-- Pillar 1: Vue -->
+                        <div style="flex: 1; min-width: 200px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5em; margin-bottom: 12px;">🟢</div>
+                            <h3 style="color: #4ade80; margin: 0 0 12px 0;">Vue.js Core</h3>
+                            <p style="color: #94a3b8; font-size: 0.9em; margin: 0; line-height: 1.5;">Reactivity, Components, and UI Rendering engine.</p>
+                        </div>
+                        
+                        <!-- Pillar 2: Nitro Server -->
+                        <div style="flex: 1; min-width: 200px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5em; margin-bottom: 12px;">⚡</div>
+                            <h3 style="color: #eab308; margin: 0 0 12px 0;">Nitro Server</h3>
+                            <p style="color: #94a3b8; font-size: 0.9em; margin: 0; line-height: 1.5;">API Routes, Server-Side Rendering (SSR), and Database calls.</p>
+                        </div>
+                        
+                        <!-- Pillar 3: Routing -->
+                        <div style="flex: 1; min-width: 200px; background: #0f172a; border: 2px solid #334155; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <div style="font-size: 2.5em; margin-bottom: 12px;">🗺️</div>
+                            <h3 style="color: #38bdf8; margin: 0 0 12px 0;">Nuxt Router</h3>
+                            <p style="color: #94a3b8; font-size: 0.9em; margin: 0; line-height: 1.5;">Automatic file-based routing, Layouts, and Middleware.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Arrows connecting down -->
+                    <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 16px; color: #475569; font-size: 2.5em;">
+                        <div>↓</div>
+                    </div>
+                    
+                    <!-- Final Output -->
+                    <div style="background: linear-gradient(90deg, #1e293b, #0f172a); padding: 24px 48px; border-radius: 12px; border: 2px dashed #00DC82; color: #e2e8f0; font-size: 1.5em; font-weight: bold; text-align: center; width: 100%; max-width: 600px;">
+                        🚀 Complete Full-Stack Web App
+                    </div>
+                </div>
+
+                <div class="info-box" style="background-color: rgba(0, 220, 130, 0.1); border-color: rgba(0, 220, 130, 0.2); color: #00DC82;">
+                    <span data-en="<strong>Main Idea:</strong> Nuxt = Vue + Routing + SSR + Data Fetching + Server + Auto Imports + More" data-kh="<strong>គំនិតសំខាន់៖</strong> Nuxt = Vue + Routing + SSR + Data Fetching + Server + Auto Imports + ច្រើនទៀត">
+                    <strong>Main Idea:</strong> Nuxt = Vue + Routing + SSR + Data Fetching + Server + Auto Imports + More
+                    </span>
+                </div>
+            </div>
+
+            <!-- CSR Section -->
+            <div class="content-section" id="csr">
+                <div class="super-title" data-en="Rendering" data-kh="ការបង្ហាញ (Rendering)">Rendering</div>
+                <h1 data-en="Client-Side Rendering (CSR)" data-kh="Client-Side Rendering (CSR)">Client-Side Rendering (CSR)</h1>
+                <p data-en="Before understanding Nuxt, we must understand how standard Vue.js or React applications work. This is called <strong>Client-Side Rendering (CSR)</strong>." data-kh="មុននឹងយល់ពី Nuxt យើងត្រូវយល់ពីរបៀបដែលកម្មវិធី Vue.js ឬ React ស្តង់ដារដំណើរការសិន។ នេះត្រូវបានគេហៅថា <strong>Client-Side Rendering (CSR)</strong>។">
+                    Before understanding Nuxt, we must understand how standard Vue.js or React applications work. This is called <strong>Client-Side Rendering (CSR)</strong>.
+                </p>
+
+                <!-- CSR Explanation -->
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; margin-top: 32px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);">
+                    <h2 style="color: #f87171; margin-top: 0; display: flex; align-items: center; gap: 12px;" data-en="📱 How CSR Works" data-kh="📱 របៀបដែល CSR ដំណើរការ">
+                        <span style="font-size: 1.5em;">📱</span> How CSR Works
+                    </h2>
+                    <p style="color: #94a3b8; line-height: 1.6;" data-en="When a user visits a CSR website, the server sends back an almost <strong>empty HTML document</strong> (just an empty div with id 'app') along with a massive JavaScript file. The user's browser (the client) has to download this JavaScript, execute it, and <em>then</em> construct the UI." data-kh="នៅពេលអ្នកប្រើប្រាស់ចូលមើលគេហទំព័រ CSR ម៉ាស៊ីនមេបញ្ជូនត្រឡប់មកវិញនូវ <strong>ឯកសារ HTML ទទេស្ទើរតែទាំងស្រុង</strong> (មានត្រឹមតែ div ទទេដែលមាន id 'app') រួមជាមួយឯកសារ JavaScript ដ៏ធំមួយ។ កម្មវិធីរុករករបស់អ្នកប្រើប្រាស់ (client) ត្រូវទាញយក JavaScript នេះ ដំណើរការវា ហើយ <em>បន្ទាប់មក</em> ទើបសាងសង់ UI ។">
+                        When a user visits a CSR website, the server sends back an almost <strong>empty HTML document</strong> (just an empty div with id 'app') along with a massive JavaScript file. The user's browser (the client) has to download this JavaScript, execute it, and <em>then</em> construct the UI.
+                    </p>
+                    
+                    <div style="background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid #334155; margin-top: 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; font-family: monospace;">
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">💻</div>
+                            <div style="color: #94a3b8; margin-top: 8px; font-size: 0.9em;" data-en="Browser requests URL" data-kh="Browser ស្នើសុំ URL">Browser requests URL</div>
+                        </div>
+                        <div style="color: #475569; font-weight: bold; font-size: 1.5em;">➔</div>
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">📄</div>
+                            <div style="color: #f87171; margin-top: 8px; font-size: 0.9em;" data-en="Server sends Blank HTML + JS" data-kh="Server បញ្ជូន HTML ទទេ + JS">Server sends Blank HTML + JS</div>
+                        </div>
+                        <div style="color: #475569; font-weight: bold; font-size: 1.5em;">➔</div>
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">⏳</div>
+                            <div style="color: #eab308; margin-top: 8px; font-size: 0.9em;" data-en="Browser builds the UI" data-kh="Browser សាងសង់ UI">Browser builds the UI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 data-en="What does 'Blank HTML' look like?" data-kh="តើ 'HTML ទទេ' មានរូបរាងយ៉ាងដូចម្តេច?" style="margin-top: 48px;">What does "Blank HTML" look like?</h3>
+                <p data-en="If you view the source code of a standard Vue.js or React website, you will usually only see this:" data-kh="ប្រសិនបើអ្នកមើលកូដប្រភព (source code) នៃគេហទំព័រ Vue.js ឬ React ស្តង់ដារ ជាទូទៅអ្នកនឹងឃើញតែប៉ុណ្ណេះ៖">If you view the source code of a standard Vue.js or React website, you will usually only see this:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📄</span> index.html (What Google sees)</div>
+                    </div>
+                    <div class="code-content">
+<span class="keyword">&lt;!DOCTYPE</span> <span class="function">html</span><span class="keyword">&gt;</span>
+<span class="keyword">&lt;html&gt;</span>
+  <span class="keyword">&lt;head&gt;</span>
+    <span class="keyword">&lt;title&gt;</span>My App<span class="keyword">&lt;/title&gt;</span>
+    <span class="keyword">&lt;script</span> <span class="function">defer</span> <span class="function">src=</span><span class="string">"/assets/main-bundle.js"</span><span class="keyword">&gt;&lt;/script&gt;</span>
+  <span class="keyword">&lt;/head&gt;</span>
+  <span class="keyword">&lt;body&gt;</span>
+    <span class="comment" data-en="&lt;!-- The entire website is injected here by JavaScript! --&gt;" data-kh="&lt;!-- គេហទំព័រទាំងមូលត្រូវបានបញ្ជូលនៅទីនេះដោយ JavaScript! --&gt;">&lt;!-- The entire website is injected here by JavaScript! --&gt;</span>
+    <span class="keyword">&lt;div</span> <span class="function">id=</span><span class="string">"app"</span><span class="keyword">&gt;&lt;/div&gt;</span>
+  <span class="keyword">&lt;/body&gt;</span>
+<span class="keyword">&lt;/html&gt;</span>
+                    </div>
+                </div>
+
+                <h3 data-en="Why use CSR?" data-kh="ហេតុអ្វីត្រូវប្រើ CSR?" style="margin-top: 48px;">Why use CSR?</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="⚡ Fast Navigation" data-kh="⚡ ផ្លាស់ប្តូរទំព័រលឿន">⚡ Fast Navigation</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Navigate between pages without a full page reload." data-kh="ផ្លាស់ប្តូរទំព័រដោយមិនចាំបាច់ផ្ទុកទំព័រឡើងវិញពេញលេញ។">Navigate between pages without a full page reload.</p>
+                    </div>
+                    
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="✨ Better User Experience" data-kh="✨ បទពិសោធន៍អ្នកប្រើប្រាស់ប្រសើរជាងមុន">✨ Better User Experience</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="The app feels more like a native application." data-kh="កម្មវិធីមានអារម្មណ៍ដូចជាកម្មវិធី Native។">The app feels more like a native application.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🖱️ Interactive UI" data-kh="🖱️ អន្តរកម្ម UI">🖱️ Interactive UI</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Great for: Buttons, Forms, Modals, Dashboards, Real-time updates." data-kh="ល្អសម្រាប់៖ ប៊ូតុង, ទម្រង់, Modals, Dashboards, ការធ្វើបច្ចុប្បន្នភាពតាមពេលវេលាជាក់ស្តែង។">Great for: Buttons, Forms, Modals, Dashboards, Real-time updates.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="📉 Less Server Rendering Work" data-kh="📉 បន្ថយការងារ Rendering របស់ម៉ាស៊ីនមេ">📉 Less Server Rendering Work</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="The browser handles most of the rendering." data-kh="កម្មវិធីរុករក (Browser) ទទួលបន្ទុកការងារ Rendering ភាគច្រើន។">The browser handles most of the rendering.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🔒 Good for Private Applications" data-kh="🔒 ល្អសម្រាប់កម្មវិធីឯកជន">🔒 Good for Private Applications</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Such as: Admin dashboard, Student management system, Employee system, Internal company tools." data-kh="ដូចជា៖ Admin dashboard, ប្រព័ន្ធគ្រប់គ្រងសិស្ស, ប្រព័ន្ធបុគ្គលិក, ឧបករណ៍ផ្ទៃក្នុងក្រុមហ៊ុន។">Such as: Admin dashboard, Student management system, Employee system, Internal company tools.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🔄 Dynamic Data Updates" data-kh="🔄 ការធ្វើបច្ចុប្បន្នភាពទិន្នន័យដោយថាមវន្ត">🔄 Dynamic Data Updates</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="You can fetch data and update only part of the page." data-kh="អ្នកអាចទាញយកទិន្នន័យ និងធ្វើបច្ចុប្បន្នភាពតែមួយផ្នែកនៃទំព័រប៉ុណ្ណោះ។">You can fetch data and update only part of the page.</p>
+                    </div>
+                </div>
+
+                <h3 data-en="The Problems with CSR" data-kh="បញ្ហាជាមួយ CSR" style="margin-top: 48px;">The Problems with CSR</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="⏳ Slower First Load" data-kh="⏳ ទាញយកដំបូងយឺត">⏳ Slower First Load</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="The browser must download and run massive JavaScript files before showing anything." data-kh="កម្មវិធីរុករកត្រូវទាញយក និងដំណើរការឯកសារ JavaScript ដ៏ធំ មុនពេលបង្ហាញអ្វីទាំងអស់។">The browser must download and run massive JavaScript files before showing anything.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="🔄 Loading States" data-kh="🔄 ស្ថានភាពកំពុងទាញយក">🔄 Loading States</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="You must show spinners or skeletons while data is being fetched from APIs." data-kh="អ្នកត្រូវតែបង្ហាញ spinners ឬ skeletons ខណៈពេលដែលទិន្នន័យកំពុងត្រូវបានទាញយកពី APIs ។">You must show spinners or skeletons while data is being fetched from APIs.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="📱 Heavy on User Devices" data-kh="📱 ធ្ងន់សម្រាប់ឧបករណ៍អ្នកប្រើប្រាស់">📱 Heavy on User Devices</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="More work for the user's device — especially older/slower phones and computers." data-kh="ការងារកាន់តែច្រើនសម្រាប់ឧបករណ៍របស់អ្នកប្រើប្រាស់ ជាពិសេសទូរស័ព្ទ និងកុំព្យូទ័រចាស់ៗឬយឺត។">More work for the user's device — especially older/slower phones and computers.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="❌ Poor SEO" data-kh="❌ SEO ខ្សោយ">❌ Poor SEO</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="SEO is much less straightforward. Bots often see a blank page without content." data-kh="SEO មិនសូវមានភាពងាយស្រួលទេ។ Bots ភាគច្រើនឃើញតែទំព័រទទេដែលគ្មានមាតិកា។">SEO is much less straightforward. Bots often see a blank page without content.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="⚠️ JS Dependency" data-kh="⚠️ ភាពអាស្រ័យលើ JS">⚠️ JS Dependency</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="JavaScript is absolutely required for the application to fully function." data-kh="JavaScript គឺពិតជាចាំបាច់ណាស់ដើម្បីឱ្យកម្មវិធីដំណើរការពេញលេញ។">JavaScript is absolutely required for the application to fully function.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="📦 Bundle Size" data-kh="📦 ទំហំ Bundle">📦 Bundle Size</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Large JavaScript bundles can severely hurt performance." data-kh="ឯកសារ JavaScript Bundle ដែលមានទំហំធំអាចធ្វើឱ្យប៉ះពាល់ដល់ដំណើរការកម្មវិធីយ៉ាងខ្លាំង។">Large JavaScript bundles can severely hurt performance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSR Section -->
+            <div class="content-section" id="ssr">
+                <div class="super-title" data-en="Rendering" data-kh="ការបង្ហាញ (Rendering)">Rendering</div>
+                <h1 data-en="Server-Side Rendering (SSR)" data-kh="Server-Side Rendering (SSR)">Server-Side Rendering (SSR)</h1>
+                <p data-en="To solve the massive problems with CSR, Nuxt introduces <strong>Server-Side Rendering (SSR)</strong>." data-kh="ដើម្បីដោះស្រាយបញ្ហាធំៗជាមួយ CSR, Nuxt ណែនាំ <strong>Server-Side Rendering (SSR)</strong>។">
+                    To solve the massive problems with CSR, Nuxt introduces <strong>Server-Side Rendering (SSR)</strong>.
+                </p>
+
+                <!-- SSR Explanation -->
+                <div style="background: rgba(0, 220, 130, 0.05); border: 1px solid rgba(0, 220, 130, 0.3); border-radius: 12px; padding: 32px; margin-top: 32px; box-shadow: 0 10px 15px -3px rgba(0,220,130,0.1);">
+                    <h2 style="color: #00DC82; margin-top: 0; display: flex; align-items: center; gap: 12px;" data-en="🌍 How SSR Works" data-kh="🌍 របៀបដែល SSR ដំណើរការ">
+                        <span style="font-size: 1.5em;">🌍</span> How SSR Works
+                    </h2>
+                    <p style="color: #94a3b8; line-height: 1.6;" data-en="When a user visits a Nuxt website, Nuxt's Nitro Server acts like a browser <strong>on the server</strong>. It builds the Vue components, fetches data from the database, constructs a fully complete HTML document, and sends it to the user. The browser receives a finished page." data-kh="នៅពេលអ្នកប្រើប្រាស់ចូលមើលគេហទំព័រ Nuxt ម៉ាស៊ីនមេ Nitro របស់ Nuxt ដើរតួជាកម្មវិធីរុករក <strong>នៅលើម៉ាស៊ីនមេ</strong>។ វាសាងសង់ Vue components ទាញយកទិន្នន័យពីមូលដ្ឋានទិន្នន័យ បង្កើតឯកសារ HTML ពេញលេញមួយ ហើយបញ្ជូនវាទៅអ្នកប្រើប្រាស់។ កម្មវិធីរុករកទទួលបានទំព័រដែលបានបញ្ចប់។">
+                        When a user visits a Nuxt website, Nuxt's Nitro Server acts like a browser <strong>on the server</strong>. It builds the Vue components, fetches data from the database, constructs a fully complete HTML document, and sends it to the user. The browser receives a finished page.
+                    </p>
+                    
+                    <div style="background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid rgba(0, 220, 130, 0.2); margin-top: 24px; display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; font-family: monospace;">
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">💻</div>
+                            <div style="color: #94a3b8; margin-top: 8px; font-size: 0.9em;" data-en="Browser requests URL" data-kh="Browser ស្នើសុំ URL">Browser requests URL</div>
+                        </div>
+                        <div style="color: #00DC82; font-weight: bold; font-size: 1.5em;">➔</div>
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">⚡</div>
+                            <div style="color: #eab308; margin-top: 8px; font-size: 0.9em;" data-en="Nitro builds HTML instantly" data-kh="Nitro សាងសង់ HTML ភ្លាមៗ">Nitro builds HTML instantly</div>
+                        </div>
+                        <div style="color: #00DC82; font-weight: bold; font-size: 1.5em;">➔</div>
+                        <div style="text-align: center; flex: 1; min-width: 150px;">
+                            <div style="font-size: 2em;">🚀</div>
+                            <div style="color: #00DC82; margin-top: 8px; font-size: 0.9em;" data-en="Browser receives Full UI" data-kh="Browser ទទួលបាន UI ពេញលេញ">Browser receives Full UI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 data-en="What does 'Full HTML' look like?" data-kh="តើ 'HTML ពេញលេញ' មានរូបរាងយ៉ាងដូចម្តេច?" style="margin-top: 48px;">What does "Full HTML" look like?</h3>
+                <p data-en="If you view the source code of a Nuxt SSR website, you will see all of your content already there:" data-kh="ប្រសិនបើអ្នកមើលកូដប្រភព (source code) នៃគេហទំព័រ Nuxt SSR អ្នកនឹងឃើញមាតិការបស់អ្នកទាំងអស់នៅទីនោះរួចជាស្រេច៖">If you view the source code of a Nuxt SSR website, you will see all of your content already there:</p>
+                <div class="code-window">
+                    <div class="code-header">
+                        <div class="code-header-left"><span class="icon">📄</span> index.html (What Google sees)</div>
+                    </div>
+                    <div class="code-content" style="border-color: #00DC82;">
+<span class="keyword">&lt;!DOCTYPE</span> <span class="function">html</span><span class="keyword">&gt;</span>
+<span class="keyword">&lt;html&gt;</span>
+  <span class="keyword">&lt;head&gt;</span>
+    <span class="keyword">&lt;title&gt;</span>My Awesome Nuxt Blog<span class="keyword">&lt;/title&gt;</span>
+    <span class="keyword">&lt;meta</span> <span class="function">name=</span><span class="string">"description"</span> <span class="function">content=</span><span class="string">"Read my amazing articles"</span> <span class="keyword">/&gt;</span>
+  <span class="keyword">&lt;/head&gt;</span>
+  <span class="keyword">&lt;body&gt;</span>
+    <span class="comment" data-en="&lt;!-- The content is already here! Perfect for SEO! --&gt;" data-kh="&lt;!-- មាតិកាគឺនៅទីនេះរួចរាល់ហើយ! ល្អឥតខ្ចោះសម្រាប់ SEO! --&gt;">&lt;!-- The content is already here! Perfect for SEO! --&gt;</span>
+    <span class="keyword">&lt;div</span> <span class="function">id=</span><span class="string">"__nuxt"</span><span class="keyword">&gt;</span>
+      <span class="keyword">&lt;header&gt;</span>
+        <span class="keyword">&lt;h1&gt;</span>Welcome to my Blog<span class="keyword">&lt;/h1&gt;</span>
+      <span class="keyword">&lt;/header&gt;</span>
+      <span class="keyword">&lt;main&gt;</span>
+        <span class="keyword">&lt;article&gt;</span>Why Nuxt 4 is amazing...<span class="keyword">&lt;/article&gt;</span>
+      <span class="keyword">&lt;/main&gt;</span>
+    <span class="keyword">&lt;/div&gt;</span>
+  <span class="keyword">&lt;/body&gt;</span>
+<span class="keyword">&lt;/html&gt;</span>
+                    </div>
+                </div>
+
+                <h3 data-en="Why use SSR?" data-kh="ហេតុអ្វីត្រូវប្រើ SSR?" style="margin-top: 48px;">Why use SSR?</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="📈 Perfect SEO" data-kh="📈 SEO ល្អឥតខ្ចោះ">📈 Perfect SEO</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Google's bots see fully populated HTML. Crucial for E-commerce and blogs." data-kh="Bots របស់ Google ឃើញ HTML ពេញលេញ។ សំខាន់ណាស់សម្រាប់ E-commerce និង blogs។">Google's bots see fully populated HTML. Crucial for E-commerce and blogs.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🚀 Faster Initial Paint" data-kh="🚀 បង្ហាញទំព័រដំបូងលឿន">🚀 Faster Initial Paint</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Users see the content instantly, with no white screen while waiting for JS." data-kh="អ្នកប្រើប្រាស់ឃើញមាតិកាភ្លាមៗ ដោយគ្មានអេក្រង់សរង់ចាំ JS នោះទេ។">Users see the content instantly, with no white screen while waiting for JS.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🔗 Social Media Previews" data-kh="🔗 ការបង្ហាញជាមុនលើបណ្តាញសង្គម">🔗 Social Media Previews</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Links shared on Facebook/Twitter correctly display titles and images." data-kh="តំណភ្ជាប់ដែលបានចែករំលែកនៅលើ Facebook/Twitter បង្ហាញចំណងជើង និងរូបភាពបានត្រឹមត្រូវ។">Links shared on Facebook/Twitter correctly display titles and images.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🔋 Better for Low-End Devices" data-kh="🔋 ល្អសម្រាប់ឧបករណ៍ខ្សោយ">🔋 Better for Low-End Devices</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="The server does the heavy lifting, saving battery and CPU on cheap phones." data-kh="ម៉ាស៊ីនមេធ្វើការងារធ្ងន់ៗ ដែលជួយសន្សំសំចៃថ្ម និង CPU លើទូរស័ព្ទថោកៗ។">The server does the heavy lifting, saving battery and CPU on cheap phones.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🛡️ Secure Data Fetching" data-kh="🛡️ សុវត្ថិភាពទិន្នន័យ">🛡️ Secure Data Fetching</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="API keys and database credentials can be securely hidden on the server." data-kh="API keys និង credentials មូលដ្ឋានទិន្នន័យអាចត្រូវបានលាក់ដោយសុវត្ថិភាពនៅលើម៉ាស៊ីនមេ។">API keys and database credentials can be securely hidden on the server.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(0, 220, 130, 0.05); border-color: rgba(0, 220, 130, 0.2);">
+                        <strong style="color: #00DC82; font-size: 1.1em;" data-en="🌍 Better for Slow Networks" data-kh="🌍 ល្អសម្រាប់អ៊ីនធឺណិតយឺត">🌍 Better for Slow Networks</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="HTML is small and downloads quickly, providing a resilient user experience." data-kh="HTML មានទំហំតូច និងទាញយកបានលឿន ផ្តល់បទពិសោធន៍អ្នកប្រើប្រាស់ដែលធន់នឹងភាពយឺត។">HTML is small and downloads quickly, providing a resilient user experience.</p>
+                    </div>
+                </div>
+
+                <h3 data-en="The Problems with SSR" data-kh="បញ្ហាជាមួយ SSR" style="margin-top: 48px;">The Problems with SSR</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px;">
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="💵 Higher Hosting Costs" data-kh="💵 តម្លៃ Hosting ខ្ពស់">💵 Higher Hosting Costs</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Requires an active Node.js server running 24/7, which costs money." data-kh="ត្រូវការម៉ាស៊ីនមេ Node.js សកម្មដែលដំណើរការ 24 ម៉ោង លើ 7 ថ្ងៃ ដែលត្រូវចំណាយលុយ។">Requires an active Node.js server running 24/7, which costs money.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="🐢 Slower Time to Interactive" data-kh="🐢 ប្រើពេលយូរដើម្បីមានអន្តរកម្ម">🐢 Slower Time to Interactive</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Users see the UI instantly, but buttons might not work until Hydration finishes." data-kh="អ្នកប្រើប្រាស់ឃើញ UI ភ្លាមៗ ប៉ុន្តែប៊ូតុងប្រហែលជាមិនដំណើរការរហូតដល់ Hydration បញ្ចប់។">Users see the UI instantly, but buttons might not work until Hydration finishes.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="🏋️ High Server Overhead" data-kh="🏋️ បន្ទុកម៉ាស៊ីនមេខ្ពស់">🏋️ High Server Overhead</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="High traffic forces the server to build HTML repeatedly. Caching is mandatory." data-kh="ចរាចរណ៍ខ្ពស់បង្ខំឱ្យម៉ាស៊ីនមេសាងសង់ HTML ច្រើនដង។ ការធ្វើ Cache គឺចាំបាច់ណាស់។">High traffic forces the server to build HTML repeatedly. Caching is mandatory.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="🧠 Added Complexity" data-kh="🧠 ភាពស្មុគស្មាញបន្ថែម">🧠 Added Complexity</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Developers must carefully manage code to avoid 'window is undefined' errors on the server." data-kh="អ្នកអភិវឌ្ឍន៍ត្រូវគ្រប់គ្រងកូដដោយប្រុងប្រយ័ត្នដើម្បីជៀសវាងកំហុស 'window is undefined' នៅលើម៉ាស៊ីនមេ។">Developers must carefully manage code to avoid "window is undefined" errors on the server.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="⏳ Slower Initial Response" data-kh="⏳ ការឆ្លើយតបដំបូងយឺត">⏳ Slower Initial Response</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="The server must fetch data and render the UI before it can send the first byte of HTML." data-kh="ម៉ាស៊ីនមេត្រូវទាញយកទិន្នន័យ និងបង្ហាញ UI មុនពេលវាអាចបញ្ជូន HTML ដំបូង។">The server must fetch data and render the UI before it can send the first byte of HTML.</p>
+                    </div>
+
+                    <div class="info-box" style="margin: 0; background-color: rgba(248, 113, 113, 0.05); border-color: rgba(248, 113, 113, 0.2);">
+                        <strong style="color: #f87171; font-size: 1.1em;" data-en="🔧 Harder to Deploy" data-kh="🔧 ពិបាកក្នុងការដាក់ឱ្យដំណើរការ">🔧 Harder to Deploy</strong>
+                        <p style="margin: 8px 0 0 0;" data-en="Deploying a Node app requires more configuration than uploading static CSR files." data-kh="ការដាក់ឱ្យដំណើរការកម្មវិធី Node ត្រូវការការកំណត់រចនាសម្ព័ន្ធច្រើនជាងការបង្ហោះឯកសារ CSR ឋិតិវន្ត។">Deploying a Node app requires more configuration than uploading static CSR files.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSR vs SSR Comparison Section -->
+            <div class="content-section" id="csr-vs-ssr-compare">
+                <div class="super-title" data-en="Rendering" data-kh="ការបង្ហាញ (Rendering)">Rendering</div>
+                <h1 data-en="CSR vs SSR: Summary" data-kh="CSR ធៀបនឹង SSR: សេចក្តីសង្ខេប">CSR vs SSR: Summary</h1>
+                <p data-en="Now that we understand both CSR and SSR, let's look at a direct comparison before introducing Nuxt's ultimate solution." data-kh="ឥឡូវនេះយើងយល់ពី CSR និង SSR ហើយ សូមមើលការប្រៀបធៀបដោយផ្ទាល់ មុននឹងណែនាំពីដំណោះស្រាយចុងក្រោយរបស់ Nuxt។">
+                    Now that we understand both CSR and SSR, let's look at a direct comparison before introducing Nuxt's ultimate solution.
+                </p>
+                
+                <div style="overflow-x: auto; width: 100%; margin-top: 32px;">
+                    <table style="width: 100%; min-width: 600px; margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th data-en="Feature" data-kh="លក្ខណៈពិសេស">Feature</th>
+                            <th data-en="Client-Side (CSR)" data-kh="Client-Side (CSR)">Client-Side (CSR)</th>
+                            <th data-en="Server-Side (SSR)" data-kh="Server-Side (SSR)">Server-Side (SSR)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td data-en="<strong>Initial Page Load</strong>" data-kh="<strong>ទាញយកទំព័រដំបូង</strong>"><strong>Initial Page Load</strong></td>
+                            <td style="color: #f87171;" data-en="⏳ Slow (Blank screen first)" data-kh="⏳ យឺត (អេក្រង់សជាមុនសិន)">⏳ Slow (Blank screen first)</td>
+                            <td style="color: #00DC82;" data-en="🚀 Fast (Instant content)" data-kh="🚀 លឿន (មាតិកាភ្លាមៗ)">🚀 Fast (Instant content)</td>
+                        </tr>
+                        <tr>
+                            <td data-en="<strong>SEO (Search Engines)</strong>" data-kh="<strong>SEO (ម៉ាស៊ីនស្វែងរក)</strong>"><strong>SEO (Search Engines)</strong></td>
+                            <td style="color: #f87171;" data-en="❌ Poor (Bots see blank HTML)" data-kh="❌ ខ្សោយ (Bots ឃើញទំព័រទទេ)">❌ Poor (Bots see blank HTML)</td>
+                            <td style="color: #00DC82;" data-en="✅ Excellent (Full HTML)" data-kh="✅ ល្អឥតខ្ចោះ (HTML ពេញលេញ)">✅ Excellent (Full HTML)</td>
+                        </tr>
+                        <tr>
+                            <td data-en="<strong>Navigation Speed</strong>" data-kh="<strong>ល្បឿនផ្លាស់ប្តូរទំព័រ</strong>"><strong>Navigation Speed</strong></td>
+                            <td style="color: #00DC82;" data-en="⚡ Very Fast (No refresh)" data-kh="⚡ លឿនខ្លាំង (គ្មានការផ្ទុកទំព័រឡើងវិញ)">⚡ Very Fast (No refresh)</td>
+                            <td style="color: #f87171;" data-en="🐢 Slower (Requires refresh)" data-kh="🐢 យឺតជាង (ត្រូវការផ្ទុកទំព័រឡើងវិញ)">🐢 Slower (Requires refresh)</td>
+                        </tr>
+                        <tr>
+                            <td data-en="<strong>Hosting Costs</strong>" data-kh="<strong>តម្លៃ Hosting</strong>"><strong>Hosting Costs</strong></td>
+                            <td style="color: #00DC82;" data-en="💵 Free / Cheap (Static files)" data-kh="💵 ឥតគិតថ្លៃ / ថោក (ឯកសារឋិតិវន្ត)">💵 Free / Cheap (Static files)</td>
+                            <td style="color: #f87171;" data-en="💸 High (Requires Server/Node)" data-kh="💸 ថ្លៃ (ត្រូវការ Server/Node)">💸 High (Requires Server/Node)</td>
+                        </tr>
+                        <tr>
+                            <td data-en="<strong>Server Load</strong>" data-kh="<strong>បន្ទុកម៉ាស៊ីនមេ</strong>"><strong>Server Load</strong></td>
+                            <td style="color: #00DC82;" data-en="📉 Low (Browser does the work)" data-kh="📉 ទាប (Browser ជាអ្នកធ្វើការ)">📉 Low (Browser does the work)</td>
+                            <td style="color: #f87171;" data-en="🏋️ High (Server builds every page)" data-kh="🏋️ ខ្ពស់ (Server សាងសង់គ្រប់ទំព័រ)">🏋️ High (Server builds every page)</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Universal Rendering (Hydration) Section -->
+            <div class="content-section" id="csr-vs-ssr">
+                <div class="super-title" data-en="Rendering" data-kh="ការបង្ហាញ (Rendering)">Rendering</div>
+                <h1 data-en="Universal Rendering (Hydration)" data-kh="Universal Rendering (Hydration)">Universal Rendering (Hydration)</h1>
+                <p data-en="So, SSR is perfect, right? Not entirely. If we only sent static HTML from the server, the website wouldn't be interactive (buttons wouldn't work, no Vue reactivity). This is where Nuxt does magic." data-kh="អញ្ចឹង SSR គឺល្អឥតខ្ចោះមែនទេ? មិនទាំងស្រុងទេ។ ប្រសិនបើយើងបញ្ជូនតែ HTML ឋិតិវន្តពីម៉ាស៊ីនមេ គេហទំព័រនឹងមិនមានអន្តរកម្មទេ (ប៊ូតុងនឹងមិនដំណើរការ គ្មាន Vue reactivity)។ នេះគឺជាកន្លែងដែល Nuxt បង្ហាញភាពអស្ចារ្យរបស់វា។">
+                    So, SSR is perfect, right? Not entirely. If we only sent static HTML from the server, the website wouldn't be interactive (buttons wouldn't work, no Vue reactivity). This is where Nuxt does magic.
+                </p>
+
+                <div class="info-box" style="margin-top: 32px; background-color: rgba(56, 189, 248, 0.05); border-color: rgba(56, 189, 248, 0.3); color: #38bdf8;">
+                    <div style="width: 100%;">
+                        <strong data-en="💧 The Best of Both Worlds: Hydration" data-kh="💧 ការរួមបញ្ចូលគ្នាដ៏ល្អបំផុត៖ Hydration" style="font-size: 1.2em;">💧 The Best of Both Worlds: Hydration</strong>
+                        <p data-en="Nuxt uses <strong>Universal Rendering</strong>. It does <strong>both</strong> SSR and CSR seamlessly:" data-kh="Nuxt ប្រើប្រាស់ <strong>Universal Rendering</strong>។ វាធ្វើទាំង <strong>SSR និង CSR</strong> យ៉ាងរលូន៖" style="margin: 16px 0 8px 0; line-height: 1.6; color: var(--text-color);">
+                            Nuxt uses <strong>Universal Rendering</strong>. It does <strong>both</strong> SSR and CSR seamlessly:
+                        </p>
+                        <ol style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: var(--text-color); line-height: 1.8;">
+                            <li data-en="<strong>Step 1 (SSR):</strong> Nuxt builds the page on the server and sends HTML to the user so they see the content instantly." data-kh="<strong>ជំហានទី 1 (SSR):</strong> Nuxt សាងសង់ទំព័រនៅលើម៉ាស៊ីនមេ ហើយបញ្ជូន HTML ទៅអ្នកប្រើប្រាស់ ដើម្បីឱ្យពួកគេមើលឃើញមាតិកាភ្លាមៗ។"><strong>Step 1 (SSR):</strong> Nuxt builds the page on the server and sends HTML to the user so they see the content instantly.</li>
+                            <li data-en="<strong>Step 2:</strong> In the background, the browser downloads the Vue JavaScript." data-kh="<strong>ជំហានទី 2:</strong> នៅផ្ទៃខាងក្រោយ កម្មវិធីរុករកទាញយក Vue JavaScript ។"><strong>Step 2:</strong> In the background, the browser downloads the Vue JavaScript.</li>
+                            <li data-en="<strong>Step 3 (Hydration):</strong> Vue 'wakes up' the static HTML and attaches interactivity (click listeners, state, reactivity) to the page." data-kh="<strong>ជំហានទី 3 (Hydration):</strong> Vue 'ដាស់' HTML ឋិតិវន្តឱ្យភ្ញាក់ឡើង ហើយភ្ជាប់អន្តរកម្ម (ចុច, ស្ថានភាព, reactivity) ទៅកាន់ទំព័រ។"><strong>Step 3 (Hydration):</strong> Vue "wakes up" the static HTML and attaches interactivity (click listeners, state, reactivity) to the page.</li>
+                            <li data-en="<strong>Step 4 (CSR):</strong> When the user clicks a link to go to a new page, Nuxt acts like standard Vue (CSR). It doesn't ask the server for a full HTML document again, it just swaps components instantly on the client." data-kh="<strong>ជំហានទី 4 (CSR):</strong> នៅពេលអ្នកប្រើប្រាស់ចុចតំណដើម្បីទៅកាន់ទំព័រថ្មី Nuxt ដំណើរការដូចជា Vue ស្តង់ដារ (CSR) ។ វាមិនស្នើសុំឯកសារ HTML ពេញលេញពីម៉ាស៊ីនមេម្តងទៀតទេ វាគ្រាន់តែប្តូរ components ភ្លាមៗនៅលើម៉ាស៊ីនកូន (client) ប៉ុណ្ណោះ។"><strong>Step 4 (CSR):</strong> When the user clicks a link to go to a new page, Nuxt acts like standard Vue (CSR). It doesn't ask the server for a full HTML document again, it just swaps components instantly on the client.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div style="background: linear-gradient(90deg, #1e293b, #0f172a); padding: 24px 48px; border-radius: 12px; border: 2px dashed #00DC82; color: #e2e8f0; font-size: 1.2em; text-align: center; width: 100%; margin-top: 32px;">
+                    <span data-en="Nuxt gives you the <strong>SEO and Speed</strong> of SSR, with the <strong>Smooth Interactivity</strong> of CSR." data-kh="Nuxt ផ្តល់ឱ្យអ្នកនូវ <strong>SEO និងល្បឿន</strong> នៃ SSR ជាមួយនឹង <strong>អន្តរកម្មរលូន</strong> នៃ CSR ។">
+                        Nuxt gives you the <strong style="color: #00DC82;">SEO and Speed</strong> of SSR, with the <strong style="color: #38bdf8;">Smooth Interactivity</strong> of CSR.
+                    </span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('show');
+            document.getElementById('sidebar-overlay').classList.toggle('show');
+        }
+
+        function showSection(id, element) {
+            // Close sidebar on mobile
+            document.getElementById('sidebar').classList.remove('show');
+            document.getElementById('sidebar-overlay').classList.remove('show');
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            // Show content section
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            
+            // Scroll to top of main content
+            document.querySelector('.main-content').scrollTop = 0;
+        }
+
+        function toggleDropdown() {
+            document.getElementById('lang-menu').classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.onclick = function(event) {
+            if (!event.target.closest('.dropdown-container')) {
+                const menu = document.getElementById('lang-menu');
+                if (menu) menu.classList.remove('show');
+            }
+        }
+
+        function setLang(lang, label) {
+            // Update custom dropdown label if provided
+            if (label) {
+                document.getElementById('current-lang-text').innerHTML = label;
+                document.getElementById('lang-menu').classList.remove('show');
+            } else {
+                // Initial load
+                const lbl = lang === 'kh' ? '<span class="fi fi-kh"></span> ភាសាខ្មែរ' : '<span class="fi fi-gb"></span> English';
+                const el = document.getElementById('current-lang-text');
+                if (el) el.innerHTML = lbl;
+            }
+            
+            // Update text elements
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (text) {
+                    el.innerHTML = text;
+                }
+            });
+            
+            // Store preference in localStorage
+            localStorage.setItem('nuxt-doc-lang', lang);
+        }
+
+        // Initialize language from local storage or default to en
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedLang = localStorage.getItem('nuxt-doc-lang') || 'en';
+            setLang(savedLang);
+
+            // Copy to clipboard functionality
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const codeWindow = btn.closest('.code-window');
+                    const codeContent = codeWindow.querySelector('.code-content');
+                    
+                    // Extract text (innerText preserves visual layout and newlines)
+                    const textToCopy = codeContent.innerText.trim();
+                    
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        const originalHtml = btn.innerHTML;
+                        const currentLang = localStorage.getItem('nuxt-doc-lang') || 'en';
+                        
+                        // Visual feedback
+                        btn.innerText = currentLang === 'kh' ? 'បានចម្លង!' : 'Copied!';
+                        btn.style.color = '#00DC82';
+                        btn.style.borderColor = '#00DC82';
+                        
+                        // Revert after 2 seconds
+                        setTimeout(() => {
+                            btn.innerHTML = originalHtml;
+                            btn.style.color = '';
+                            btn.style.borderColor = '';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
